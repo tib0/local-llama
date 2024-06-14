@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Non selectable text */
+.user-select-none {
+  user-select: none;
+}
+p,
+span {
+  font-size: 1.125rem /* 18px */;
+  line-height: 1.75rem /* 28px */;
+}
+h1 {
+  font-size: 3rem /* 48px */;
+  line-height: 1;
+}
+a:focus,
+*:focus {
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+  outline: 2px solid oklch(var(--p) / 0.4);
+  outline-offset: 2px;
+  -moz-outline-radius: 1rem;
+  -webkit-outline-radius: 1rem;
+}
+a:hover {
+  text-decoration: underline;
+}
+::-moz-selection {
+  --tw-text-opacity: 0.9;
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+  background: oklch(var(--p) / 0.3);
+}
+::selection {
+  --tw-text-opacity: 0.9;
+  color: var(--fallback-bc, oklch(var(--bc) / var(--tw-text-opacity)));
+  background: oklch(var(--p) / 0.3);
+}

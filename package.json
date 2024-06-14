@@ -1,0 +1,60 @@
+{
+  "name": "local-llama",
+  "productName": "local-llama",
+  "version": "0.0.1",
+  "description": "description",
+  "main": ".vite/build/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "npm run format && npm run lint && npm run typecheck && electron-forge package",
+    "foli": "npm run format && npm run lint",
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .ts,.tsx,.cts,.mts --fix",
+    "make": "electron-forge make",
+    "package": "electron-forge package",
+    "publish": "electron-forge publish",
+    "start": "electron-forge start",
+    "typecheck": "tsc --noEmit -p tsconfig.json --composite false"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Tib0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.4.0",
+    "@electron-forge/maker-rpm": "^7.4.0",
+    "@electron-forge/maker-squirrel": "^7.4.0",
+    "@electron-forge/maker-zip": "^7.4.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.4.0",
+    "@electron-forge/plugin-vite": "github:fozziethebeat/electron-forge-plugin-vite-esm#plugin-vite-esm",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/uuid": "^9.0.8",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "daisyui": "^4.12.2",
+    "electron": "^31.0.0",
+    "eslint": "^8.55.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.0",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2",
+    "vite-tsconfig-paths": "^4.2.1"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.1.0",
+    "node-llama-cpp": "3.0.0-beta.27",
+    "prettier": "^3.3.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "react-router-dom": "^6.23.1",
+    "uuid": "^10.0.0"
+  }
+}

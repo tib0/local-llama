@@ -1,0 +1,9 @@
+out
+dist
+.vite
+pnpm-lock.yaml
+yarn-lock.yaml
+package-lock.yaml
+LICENSE.md
+tsconfig.json
+tsconfig.*.json

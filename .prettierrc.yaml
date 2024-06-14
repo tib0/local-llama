@@ -1,0 +1,8 @@
+printWidth: 95
+singleQuote: false
+proseWrap: always
+tabWidth: 2
+useTabs: false
+trailingComma: all
+bracketSpacing: true
+semi: true
