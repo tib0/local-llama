@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 

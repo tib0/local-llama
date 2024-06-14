@@ -6,14 +6,14 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-export interface IElectronAPI {
-  loadPreferences: () => Promise<void>;
-  loadModel: () => Promise<boolean>;
-  chat: (p: string) => Promise<string>;
-}
-
 declare global {
   interface Window {
     electronAPI: IElectronAPI;
   }
+}
+
+export interface IElectronAPI {
+  loadPreferences: () => Promise<void>;
+  loadModel: () => Promise<boolean>;
+  chat: (p: string) => Promise<string>;
 }
