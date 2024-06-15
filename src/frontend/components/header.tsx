@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { MoonIcon, SunIcon } from "../lib/icons";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 import { useThemeDetect } from "../hooks/useThemeDetect";
@@ -20,28 +20,6 @@ const Header = () => {
 
   const menuLink = (src: string) => (
     <>
-      <li key={"blogLink" + src}>
-        <Link
-          key="blogLink"
-          className={`
-          mx-2 font-light text-lg
-        `}
-          to="/"
-        >
-          Home
-        </Link>
-      </li>
-      <li key={"dbLink" + src}>
-        <Link
-          key="dbLink"
-          className={`
-            mx-2 font-light text-lg
-          `}
-          to="/items"
-        >
-          DB
-        </Link>
-      </li>
       <li key={"dbChat" + src}>
         <Link
           key="dbChat"
@@ -122,7 +100,7 @@ const Header = () => {
             </ul>
           </div>
           <Link className={`font-black text-2xl text-primary p-3`} key="homeBlogLink" to="/">
-            NPT
+            L³
           </Link>
           {/* MOBILE */}
           <label className="swap swap-rotate md:hidden p-2" aria-label="Swap-theme">
