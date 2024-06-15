@@ -66,7 +66,7 @@ const createWindow = () => {
       setTimeout(function () {
         splash.destroy();
         mainWindow.show();
-      }, 1200);
+      }, 2000);
     });
   }
 
