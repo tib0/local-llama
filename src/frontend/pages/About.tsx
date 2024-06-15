@@ -8,35 +8,72 @@ function About(): JSX.Element {
       <React.Fragment>
         <title>Local Llama - About</title>
         <div
-          className={`
-            flex flex-col items-center
-            justify-center
+          className={`min-h-[calc(100vh-5rem)] text-center
           `}
         >
-          <div className="prose w-full max-w-full sm:w-[80%] sm:max-w-4xl my-2">
-            <h1>About</h1>
-            <span>
+          <h1 className="py-8 font-black">About...</h1>
+          <div>
+            <div className="py-2">
+              <p>This recreational project aim to help you run LLM models locally 🚀</p>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec porta orci
-                lectus, id euismod tellus mattis ut. Vestibulum placerat ex sit amet lacus
-                tincidunt iaculis. Donec egestas mi non augue aliquam, at aliquam mauris
-                pellentesque. Mauris tincidunt et ipsum ac malesuada. Nam non enim ligula.
-                Donec nec dictum augue. Mauris dapibus sapien vitae malesuada eleifend. Donec
-                faucibus arcu eget libero ullamcorper euismod. Ut non diam pellentesque, auctor
-                est sit amet, vehicula nisi. Sed non sagittis metus. Integer semper vitae leo a
-                mattis. Vestibulum porttitor tortor a tempor elementum. Pellentesque habitant
-                morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                With local llama you can safely use Llama 3 models without needing to register
+                to any exernal services.
               </p>
               <p>
-                Suspendisse enim orci, fermentum a condimentum eget, lacinia eget magna.
-                Suspendisse quis porta eros. Fusce mollis at nisl ut congue. In cursus purus
-                vitae imperdiet interdum. Sed viverra justo et varius ornare. Pellentesque quis
-                laoreet dui, id vestibulum ipsum. Morbi elit ex, sollicitudin sed sapien in,
-                aliquam hendrerit eros.
+                {
+                  'You will be able to run gguf models. You can find them by searching for "gguf" at '
+                }
+                <a href="https://huggingface.co/models?search=gguf" target="_blank">
+                  Hugginface.co
+                </a>
               </p>
-            </span>
-            <Link className="btn btn-primary shadow-lg" tabIndex={0} to="/">
-              Go to home page
+            </div>
+            <div className="flex flex-col justify-center items-center">
+              <p>
+                This project would not have come to life without the amazing work done by the
+                awsome teams and people :
+              </p>
+              <ul className="text-left list-none md:list-disc list-inside mx-4 py-2 max-w-lg">
+                <li>
+                  <a
+                    href="https://github.com/fozziethebeat/electron-forge-plugin-vite-esm#plugin-vite-esm"
+                    target="_blank"
+                    className="font-black text-primary text-xl"
+                  >
+                    fozziethebeat
+                  </a>
+                  {
+                    " from SurfaceData team, with plugin-vite-esm he'd tackle down complex integration of node-llama-cpp inside an electron app."
+                  }
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/withcatai/node-llama-cpp"
+                    target="_blank"
+                    className="font-black text-primary text-xl"
+                  >
+                    withcatai
+                  </a>
+                  {" have integrated llama.cpp to node module."}
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/ggerganov/llama.cpp"
+                    target="_blank"
+                    className="font-black text-primary text-xl"
+                  >
+                    ggerganov
+                  </a>
+                  {
+                    " the hard work done here to make possible LLM inference through C++ with a minimal setup."
+                  }
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="py-8">
+            <Link className="btn btn-primary shadow-lg" tabIndex={0} to="/chat">
+              Go to chat page
             </Link>
           </div>
         </div>
