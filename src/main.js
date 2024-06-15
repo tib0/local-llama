@@ -40,9 +40,37 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    show: false,
   });
 
-  mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
+  const splash = new BrowserWindow({
+    width: 275,
+    height: 350,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+  });
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
+  }
+
+  splash.loadFile(`splash.html`);
+
+  function showFunc() {
+    mainWindow.once("ready-to-show", () => {
+      setTimeout(function () {
+        splash.destroy();
+        mainWindow.show();
+      }, 1200);
+    });
+  }
+
+  showFunc();
 };
 
 app.on("ready", createWindow);

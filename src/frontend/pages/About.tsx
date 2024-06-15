@@ -6,6 +6,7 @@ function About(): JSX.Element {
   return (
     <HomeLayout>
       <React.Fragment>
+        <title>Local Llama - About</title>
         <div
           className={`
             flex flex-col items-center

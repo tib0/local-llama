@@ -1,7 +1,7 @@
 import daisyui from "daisyui";
 
 const config = {
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{ts,tsx}"],
   daisyui: {
     darkTheme: "dracula",
     themes: [

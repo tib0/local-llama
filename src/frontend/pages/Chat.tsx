@@ -6,6 +6,7 @@ function Chat(): JSX.Element {
   return (
     <HomeLayout>
       <React.Fragment>
+        <title>Local Llama - Chat</title>
         <div
           className={`
             flex flex-col items-center
