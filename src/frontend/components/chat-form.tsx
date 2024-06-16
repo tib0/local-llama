@@ -6,18 +6,18 @@ import ChatBubbleSystem from "./chat/chat-bubble-system";
 import { MicIcon } from "../lib/icons";
 import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../providers/chat";
+import { v4 as uuidv4 } from "uuid";
 
 type ObjectWithStrings = {
   [index: string]: any[];
 };
 
 const showNotification = (m?: string) => {
-  const notificationTitle = m ?? "My Notification 🔔";
-  console.count("Start Notify");
+  const notificationTitle = m ?? `My Notification 🔔`;
   new Notification(notificationTitle, {
-    body: "This is a sample notification.",
-    tag: "test",
-  }).onclick = () => console.log("Notification Clicked");
+    body: `This is a sample notification.`,
+    tag: uuidv4(),
+  });
 };
 
 const ChatForm = () => {
@@ -25,6 +25,7 @@ const ChatForm = () => {
     title: [],
   });
   const [prompt, setPrompt] = useState<string>("");
+  const [model, setModel] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
   //const [historyStored] = usePersistentStorageValue<string>("chatHistory");
@@ -43,6 +44,12 @@ const ChatForm = () => {
 
   useEffect(() => {
     if (!loading) inputRef.current?.focus();
+    window.electronAPI.onModelChange((modelPath) => {
+      if (!modelPath) {
+        return;
+      }
+      setModel(modelPath);
+    });
   }, [loading]);
 
   async function sendPrompt() {
@@ -64,7 +71,6 @@ const ChatForm = () => {
 
     console.debug("sendPrompt");
     await window.electronAPI.chat(prompt).then((response: string) => {
-      console.debug(response);
       if (response) {
         dispatch({
           type: "PROMPT_CHAT",
@@ -72,31 +78,40 @@ const ChatForm = () => {
         });
       }
     });
-    console.debug("sendPrompt");
     setLoading(false);
   }
 
   async function initLlama() {
-    showNotification("Hey di boo");
-    console.log("initLlama");
+    showNotification(model);
 
     setLoading(true);
-    await window.electronAPI.loadModel().catch((error) => {
-      console.log("initLlama error", error);
-      setError(error);
-    });
-    /* await llamaSetHistory(JSON.parse(historyStored) as ChatHistoryItem[]).then(
-      (response: ChatHistoryItem[] | undefined) => {
+    await window.electronAPI
+      .loadModel(model)
+      .then((response: boolean) => {
         if (response) {
           dispatch({
-            type: "LOAD_CHAT",
-            payload: response,
+            type: "CLEAR_HISTORY",
           });
         }
-      },
-    ); */
+      })
+      .catch((error) => {
+        console.log("initLlama error", error);
+        setError(error);
+      });
     setLoading(false);
   }
+
+  async function clearHistory() {
+    dispatch({
+      type: "CLEAR_HISTORY",
+    });
+    showNotification("History deleted");
+  }
+
+  const changeModel = () => {
+    showNotification(model);
+    window.electronAPI.changeModel();
+  };
 
   useEffect(() => {
     setHistory(chatHistory);
@@ -121,7 +136,7 @@ const ChatForm = () => {
         <button
           type="button"
           className="btn btn-primary btn-sm shadow-xl"
-          aria-label="Persist history" // TODO
+          aria-label="Init llama"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -130,6 +145,35 @@ const ChatForm = () => {
         >
           Init Llama
         </button>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm shadow-xl"
+          aria-label="Change model"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            changeModel();
+          }}
+        >
+          Change model
+        </button>
+        <button
+          type="button"
+          className="btn btn-primary btn-sm shadow-xl"
+          aria-label="Change model"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            clearHistory();
+          }}
+        >
+          Clear history
+        </button>
+      </div>
+      <div className="flex justify-start gap-2 items-center w-full pt-3">
+        <span>
+          <p>{model}</p>
+        </span>
       </div>
       <div className="flex flex-col justify-center">
         <label
@@ -178,7 +222,7 @@ const ChatForm = () => {
                 focus:ring
                 focus:outline-none
               `}
-              aria-label="Start voice recording" // TODO
+              aria-label="Start voice recording"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -191,7 +235,6 @@ const ChatForm = () => {
         </label>
         {loading && <ChatBubbleSkeleton />}
         {history.toReversed().map((c: ChatHistoryItem, index) => {
-          console.debug(c, "chat history item");
           switch (c.type) {
             case "model":
               return (

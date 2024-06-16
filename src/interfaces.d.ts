@@ -13,7 +13,9 @@ declare global {
 }
 
 export interface IElectronAPI {
-  loadPreferences: () => Promise<void>;
-  loadModel: () => Promise<boolean>;
+  loadModel: (m?: string) => Promise<boolean>;
   chat: (p: string) => Promise<string>;
+  changeModel: () => Promise<string>;
+  clearHistory: () => Promise<void>;
+  onModelChange: (h: (modelPath?: string | undefined) => void) => Promise<void>;
 }

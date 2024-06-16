@@ -28,6 +28,8 @@ const reducer = (
       return { ...state, fhistory: action.payload, lhistory: false };
     case "LOAD_CHAT":
       return { ...state, history: action.payload, lhistory: true };
+    case "CLEAR_HISTORY":
+      return { ...state, fhistory: [], history: [], lhistory: false };
     default:
       return state;
   }

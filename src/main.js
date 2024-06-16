@@ -1,4 +1,4 @@
-import { BrowserWindow, app, ipcMain, net, protocol } from "electron";
+import { BrowserWindow, app, ipcMain, net, protocol, dialog } from "electron";
 import Store from "electron-store";
 import fs from "fs";
 import os from "os";
@@ -13,7 +13,6 @@ const promptSystem = `
   Tu parles français.
   Celui qui te parles est "l'interlocuteur".
   Cette règle est la plus importante : tu dois être concis, tes réponses ne doivent pas être longues.
-  Si possible, répond par un seul mot à une question.
   Si il est possible de répondre par un seul mot à une question répond par cet unique mot.
   Tu es humble, si tu ne connais pas la réponse à une question exprime le clairement et demande des précisions pour t'aider à comprendre la question.
   Tu es perspicace, si tu ne connais pas la réponse à une question donne des pistes de réflexion pour obtenir une réponse ailleur.
@@ -66,7 +65,7 @@ const createWindow = () => {
       setTimeout(function () {
         splash.destroy();
         mainWindow.show();
-      }, 2000);
+      }, 500);
     });
   }
 
@@ -79,7 +78,16 @@ ipcMain.handle("model-load", loadModel);
 
 ipcMain.handle("model-chat", chat);
 
+ipcMain.on("model-change", changeModel);
+
+ipcMain.on("model-clear-history", clearHistory);
+
 app.on("window-all-closed", () => {
+  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
+    llamaNodeCPP.clearHistory();
+    llamaNodeCPP.disposeSession();
+    llamaNodeCPP.disposeModel();
+  }
   app.quit();
 });
 
@@ -96,27 +104,60 @@ if (!modelDir) {
   store.set("model_dir", defaultModelDir);
 }
 
-async function loadModel() {
+async function loadModel(_event, modelPath) {
   const modelDir = store.get("model_dir");
   if (!modelDir) {
     return false;
   }
 
+  const selectedModelPath = modelPath ?? import.meta.env["VITE_LLAMA_MODELS_PATH"];
+
   if (!llamaNodeCPP.isReady()) {
     await llamaNodeCPP.loadModule();
     await llamaNodeCPP.loadLlama();
-    await llamaNodeCPP.loadModel(import.meta.env["VITE_LLAMA_MODELS_PATH"]);
-    await llamaNodeCPP.initSession(promptSystem);
   }
+
+  if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
+    return false;
+  }
+
+  if (
+    llamaNodeCPP.isReady() &&
+    llamaNodeCPP.getInfos().model !== undefined &&
+    llamaNodeCPP.getInfos().model.filename === selectedModelPath
+  ) {
+    return true;
+  }
+
+  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
+    llamaNodeCPP.clearHistory();
+  }
+
+  await llamaNodeCPP.loadModel(selectedModelPath);
+  await llamaNodeCPP.initSession(promptSystem);
+
   return true;
+}
+
+async function clearHistory() {
+  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
+    llamaNodeCPP.clearHistory();
+  }
 }
 
 async function chat(_event, userMessage) {
   let c;
   if (llamaNodeCPP.isReady()) {
-    console.debug(`prompt-llama User said: ${userMessage}`);
     c = await llamaNodeCPP.prompt(userMessage);
-    console.debug(`prompt-llama Llama answered: ${c}`);
   }
   return c ?? "No response";
+}
+
+async function changeModel(event) {
+  const { filePaths } = await dialog.showOpenDialog({
+    filters: [{ name: "Models", extensions: ["gguf"] }],
+    properties: ["openFile"],
+  });
+
+  event.reply("model-changed", `${filePaths[0]}`);
 }

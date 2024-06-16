@@ -265,6 +265,19 @@ export class LlamaWrapper {
   }
 
   /**
+   * Disposes model.
+   *
+   * @throws {Error} If no model is found.
+   */
+  public disposeModel() {
+    if (!this.model) {
+      this.setStatus(error, String("disposeModel: No model found."));
+      throw new Error(`Ignoring attempt to dispose model, no model found.`);
+    }
+    this.model.dispose();
+  }
+
+  /**
    * Clears the history of the session.
    *
    * @throws {Error} If no session or sequence is found.
