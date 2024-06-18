@@ -1,8 +1,8 @@
 {
   "name": "local-llama",
-  "productName": "local-llama",
+  "productName": "L³",
   "version": "0.0.1",
-  "description": "description",
+  "description": "L³ is an electron app that runs llama 3 models locally",
   "main": ".vite/build/main.js",
   "type": "module",
   "scripts": {

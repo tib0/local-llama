@@ -1,24 +1,39 @@
 export default {
   buildIdentifier: "esm",
   defaultResolved: true,
-  packagerConfig: {},
+  packagerConfig: {
+    appCategoryType: "public.app-category.utilities",
+    icon: "./static/icon",
+    darwinDarkModeSupport: "true",
+  },
   rebuildConfig: {},
   makers: [
     {
       name: "@electron-forge/maker-squirrel",
-      config: {},
+      config: {
+        iconUrl: "./static/icon.png",
+      },
     },
     {
       name: "@electron-forge/maker-zip",
       platforms: ["darwin"],
+      config: {
+        icon: "./static/icon.icns",
+      },
     },
     {
       name: "@electron-forge/maker-deb",
-      config: {},
+      config: {
+        options: {
+          icon: "./static/icon.png",
+        },
+      },
     },
     {
       name: "@electron-forge/maker-rpm",
-      config: {},
+      config: {
+        icon: "./static/icon.png",
+      },
     },
   ],
   plugins: [
