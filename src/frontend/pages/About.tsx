@@ -6,7 +6,6 @@ function About(): JSX.Element {
   return (
     <HomeLayout>
       <React.Fragment>
-        <title>Local Llama - About</title>
         <div
           className={`min-h-[calc(100vh-5rem)] text-center
           `}

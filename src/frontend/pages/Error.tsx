@@ -6,7 +6,6 @@ function Error(): JSX.Element {
   return (
     <HomeLayout>
       <React.Fragment>
-        <title>Local Llama - Error</title>
         <div
           className={`
           flex flex-col items-center
