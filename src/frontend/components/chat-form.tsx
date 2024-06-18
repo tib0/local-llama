@@ -7,15 +7,15 @@ import { MicIcon } from "../lib/icons";
 import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../providers/chat";
 import { v4 as uuidv4 } from "uuid";
+import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 
 type ObjectWithStrings = {
   [index: string]: any[];
 };
 
 const showNotification = (m?: string) => {
-  const notificationTitle = m ?? `My Notification 🔔`;
-  new Notification(notificationTitle, {
-    body: `This is a sample notification.`,
+  new Notification(`L³`, {
+    body: m ?? "Notification from L³",
     tag: uuidv4(),
   });
 };
@@ -25,10 +25,12 @@ const ChatForm = () => {
     title: [],
   });
   const [prompt, setPrompt] = useState<string>("");
-  const [model, setModel] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
-  //const [historyStored] = usePersistentStorageValue<string>("chatHistory");
+  const [currentModel, setCurrentModel] = usePersistentStorageValue<string | undefined>(
+    "currentModel",
+  );
+  const [model, setModel] = useState<string | undefined>(currentModel);
   const { dispatch } = useContext(ChatContext);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -49,6 +51,7 @@ const ChatForm = () => {
         return;
       }
       setModel(modelPath);
+      setCurrentModel(modelPath);
     });
   }, [loading]);
 
@@ -69,7 +72,6 @@ const ChatForm = () => {
     init();
     setLoading(true);
 
-    console.debug("sendPrompt");
     await window.electronAPI.chat(prompt).then((response: string) => {
       if (response) {
         dispatch({
@@ -81,37 +83,20 @@ const ChatForm = () => {
     setLoading(false);
   }
 
-  async function initLlama() {
-    showNotification(model);
-
-    setLoading(true);
-    await window.electronAPI
-      .loadModel(model)
-      .then((response: boolean) => {
-        if (response) {
-          dispatch({
-            type: "CLEAR_HISTORY",
-          });
-        }
-      })
-      .catch((error) => {
-        console.log("initLlama error", error);
-        setError(error);
-      });
-    setLoading(false);
-  }
-
   async function clearHistory() {
     dispatch({
       type: "CLEAR_HISTORY",
     });
-    showNotification("History deleted");
+    window.electronAPI.clearHistory();
+    showNotification("History deleted!");
   }
 
-  const changeModel = () => {
-    showNotification(model);
+  async function changeModel() {
+    setLoading(true);
     window.electronAPI.changeModel();
-  };
+    setLoading(false);
+    showNotification("Model updated!");
+  }
 
   useEffect(() => {
     setHistory(chatHistory);
@@ -132,19 +117,40 @@ const ChatForm = () => {
         }
       }}
     >
-      <div className="flex justify-start gap-2 items-center w-full pt-3">
-        <button
-          type="button"
-          className="btn btn-primary btn-sm shadow-xl"
-          aria-label="Init llama"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            initLlama();
-          }}
-        >
-          Init Llama
-        </button>
+      <div
+        className={`
+          flex gap-2 w-full pt-3 
+          flex-col sm:flex-row 
+          justify-start sm:justify-between 
+          items-start sm:items-center
+        `}
+      >
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="btn btn-primary btn-sm shadow-xl"
+            aria-label="Change model"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              changeModel();
+            }}
+          >
+            Change model
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm shadow-xl"
+            aria-label="Change model"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              clearHistory();
+            }}
+          >
+            Clear
+          </button>
+        </div>
         <button
           type="button"
           className="btn btn-primary btn-sm shadow-xl"
@@ -152,27 +158,15 @@ const ChatForm = () => {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            changeModel();
+            //todo
           }}
         >
-          Change model
-        </button>
-        <button
-          type="button"
-          className="btn btn-primary btn-sm shadow-xl"
-          aria-label="Change model"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            clearHistory();
-          }}
-        >
-          Clear history
+          Save
         </button>
       </div>
-      <div className="flex justify-start gap-2 items-center w-full pt-3">
+      <div className="flex justify-start gap-2 items-center w-full pt-3 px-1">
         <span>
-          <p>{model}</p>
+          <p>{model ? model : "Missing model, read the instruction if needed"}</p>
         </span>
       </div>
       <div className="flex flex-col justify-center">
