@@ -17,6 +17,7 @@ export type Gpu = false | "auto" | "cuda" | "vulkan" | "metal" | undefined;
 const uninitialized = { text: "uninitialized", ico: "📓" };
 const ready = { text: "ready", ico: "📗" };
 const loading = { text: "loading", ico: "📔" };
+const garbage = { text: "garbage", ico: "📘" };
 const generating = { text: "generating", ico: "📙" };
 const error = { text: "error", ico: "📕" };
 
@@ -155,7 +156,6 @@ export class LlamaWrapper {
     this.abortController = new AbortController();
     this.errorCallback = () => {
       this.abortController.abort();
-      if (this.session) this.session.dispose();
     };
   }
 
@@ -166,9 +166,9 @@ export class LlamaWrapper {
    * @param {string} [payload] - An optional payload for the status update.
    */
   private setStatus(status: LlamaStatusType, payload?: string) {
-    console.debug(
-      "\x1b[93m\x1b[103mLlamaWrapper\x1b[0m " + status.ico + " \x1b[1m(" + status.text + ")",
-      payload && payload != "undefined" ? "\x1b[0m " + payload + "\x1b[0m" : "",
+    console.log(
+      "\x1b[93m\x1b[103mLlamaWrapper\x1b[0m" + status.ico + "\x1b[1m(" + status.text + ")",
+      payload && payload != "undefined" ? "\x1b[0m" + payload + "\x1b[0m" : "",
     );
     this.status = { status, message: payload };
   }
@@ -261,7 +261,8 @@ export class LlamaWrapper {
       this.setStatus(error, String("disposeSession: No session found."));
       throw new Error(`Ignoring attempt to dispose session, no session found.`);
     }
-    this.session.dispose();
+    this.session = undefined;
+    this.setStatus(garbage, String("Session disposed."));
   }
 
   /**
@@ -274,7 +275,8 @@ export class LlamaWrapper {
       this.setStatus(error, String("disposeModel: No model found."));
       throw new Error(`Ignoring attempt to dispose model, no model found.`);
     }
-    this.model.dispose();
+    this.model = undefined;
+    this.setStatus(garbage, String("Model disposed."));
   }
 
   /**
@@ -292,6 +294,7 @@ export class LlamaWrapper {
       throw new Error(`Ignoring attempt to clear history, no sequence found for the session.`);
     }
     this.session.sequence.clearHistory();
+    this.setStatus(ready, String("History cleared."));
   }
 
   /**
