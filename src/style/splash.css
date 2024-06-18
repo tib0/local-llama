@@ -1,7 +1,7 @@
 body {
-  background-color: #df8888;
+  background-color: rgb(241, 242, 220);
   font-family: "Lexend Deca", sans-serif;
-  color: #2e475d;
+  color: #0f0f0f;
 }
 
 .container {
@@ -14,4 +14,11 @@ body {
 
 .excited-llama {
   width: 200px;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #343446;
+    font-family: "Lexend Deca", sans-serif;
+    color: #efefef;
+  }
 }

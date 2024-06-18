@@ -1,15 +1,36 @@
-import { BrowserWindow, app, ipcMain, net, protocol, dialog } from "electron";
+import { Menu, BrowserWindow, app, ipcMain, net, protocol, dialog } from "electron";
 import Store from "electron-store";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
+import { appMenu, winBounds } from "./Backend/appConfig";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const __cache = path.join(os.homedir(), ".cache/local-llama");
+const __modelsFolder = path.join(__cache, "models");
+const __logsFolder = path.join(__cache, "logs");
 
-const promptSystem = `
+let llamaNodeCPP = new LlamaWrapper();
+const store = new Store();
+
+const modelDir = store.get("model_dir");
+if (!modelDir || !fs.existsSync(__modelsFolder)) {
+  const defaultModelDir = __modelsFolder;
+  fs.mkdirSync(defaultModelDir, { recursive: true });
+  store.set("model_dir", defaultModelDir);
+}
+
+const logDir = store.get("log_dir");
+if (!logDir || !fs.existsSync(__logsFolder)) {
+  const defaultLogDir = __logsFolder;
+  fs.mkdirSync(defaultLogDir, { recursive: true });
+  store.set("log_dir", defaultLogDir);
+}
+
+let promptSystem = `
   Tu parles français.
   Celui qui te parles est "l'interlocuteur".
   Cette règle est la plus importante : tu dois être concis, tes réponses ne doivent pas être longues.
@@ -18,8 +39,6 @@ const promptSystem = `
   Tu es perspicace, si tu ne connais pas la réponse à une question donne des pistes de réflexion pour obtenir une réponse ailleur.
   Si une conversation est supérieur à deux échanges intégre parfois dans tes réponses des questions pour mieux comprendre qui est ton "l'interlocuteur" si cela est nécessaire.
 `;
-
-const llamaNodeCPP = new LlamaWrapper();
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
 
@@ -30,24 +49,21 @@ app.whenReady().then(() => {
   });
 });
 
-const store = new Store();
-
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
     show: false,
   });
 
+  mainWindow.setBounds(winBounds(store));
+
   const splash = new BrowserWindow({
     width: 275,
     height: 350,
     transparent: true,
     frame: false,
-    alwaysOnTop: true,
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -60,14 +76,24 @@ const createWindow = () => {
 
   splash.loadFile(`splash.html`);
 
+  mainWindow.on("close", () => {
+    store.set("winBounds", {
+      isMaximized: mainWindow.isMaximized(),
+      ...mainWindow.getNormalBounds(),
+    });
+  });
+
   function showFunc() {
     mainWindow.once("ready-to-show", () => {
-      setTimeout(function () {
+      setTimeout(async function () {
+        await loadModel();
         splash.destroy();
         mainWindow.show();
-      }, 500);
+      }, 1500);
     });
   }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(appMenu(store)));
 
   showFunc();
 };
@@ -83,11 +109,7 @@ ipcMain.on("model-change", changeModel);
 ipcMain.on("model-clear-history", clearHistory);
 
 app.on("window-all-closed", () => {
-  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
-    llamaNodeCPP.clearHistory();
-    llamaNodeCPP.disposeSession();
-    llamaNodeCPP.disposeModel();
-  }
+  llamaNodeCPP = undefined;
   app.quit();
 });
 
@@ -97,46 +119,50 @@ app.on("activate", () => {
   }
 });
 
-const modelDir = store.get("model_dir");
-if (!modelDir) {
-  const defaultModelDir = path.join(os.homedir(), ".cache/local-llama");
-  fs.mkdirSync(defaultModelDir, { recursive: true });
-  store.set("model_dir", defaultModelDir);
-}
-
 async function loadModel(_event, modelPath) {
   const modelDir = store.get("model_dir");
   if (!modelDir) {
-    return false;
+    return "";
   }
 
-  const selectedModelPath = modelPath ?? import.meta.env["VITE_LLAMA_MODELS_PATH"];
+  const availableModels = fs
+    .readdirSync(modelDir, { withFileTypes: true })
+    .filter((item) => !item.isDirectory())
+    .filter((item) => item.name.includes(".gguf"))
+    .map((item) => path.join(modelDir, item.name));
+
+  const selectedModelPath =
+    modelPath ?? availableModels[0] ?? import.meta.env["VITE_LLAMA_MODELS_PATH"];
+
+  if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
+    return "";
+  }
 
   if (!llamaNodeCPP.isReady()) {
     await llamaNodeCPP.loadModule();
     await llamaNodeCPP.loadLlama();
   }
 
-  if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
-    return false;
-  }
-
   if (
     llamaNodeCPP.isReady() &&
     llamaNodeCPP.getInfos().model !== undefined &&
-    llamaNodeCPP.getInfos().model.filename === selectedModelPath
+    selectedModelPath.includes(llamaNodeCPP.getInfos().model?.filename)
   ) {
-    return true;
+    return selectedModelPath;
   }
 
   if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
-    llamaNodeCPP.clearHistory();
+    await llamaNodeCPP.disposeModel();
+    await llamaNodeCPP.disposeSession();
   }
 
   await llamaNodeCPP.loadModel(selectedModelPath);
   await llamaNodeCPP.initSession(promptSystem);
 
-  return true;
+  for (const window of BrowserWindow.getAllWindows()) {
+    window.webContents.send("model-changed", selectedModelPath);
+  }
+  return selectedModelPath;
 }
 
 async function clearHistory() {
@@ -158,6 +184,8 @@ async function changeModel(event) {
     filters: [{ name: "Models", extensions: ["gguf"] }],
     properties: ["openFile"],
   });
-
-  event.reply("model-changed", `${filePaths[0]}`);
+  if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
+    return;
+  }
+  await loadModel(undefined, filePaths[0]);
 }

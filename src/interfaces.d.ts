@@ -13,7 +13,7 @@ declare global {
 }
 
 export interface IElectronAPI {
-  loadModel: (m?: string) => Promise<boolean>;
+  loadModel: (m?: string) => Promise<string>;
   chat: (p: string) => Promise<string>;
   changeModel: () => Promise<string>;
   clearHistory: () => Promise<void>;
