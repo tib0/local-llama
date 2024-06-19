@@ -165,7 +165,7 @@ const ChatForm = () => {
           Save
         </button>
       </div>
-      <div className="flex justify-start gap-2 items-center w-full pt-3 px-1">
+      <div className="flex justify-start gap-2 items-center w-full pt-3 pb-1 px-0">
         {model ? (
           <ModelInfos model={model} />
         ) : (
