@@ -17,5 +17,7 @@ export interface IElectronAPI {
   chat: (p: string) => Promise<string>;
   changeModel: () => Promise<string>;
   clearHistory: () => Promise<void>;
+  clipboardCopy: (c: string) => Promise<void>;
+  getModelInfo: () => Promise<string>;
   onModelChange: (h: (modelPath?: string | undefined) => void) => Promise<void>;
 }

@@ -1,9 +1,11 @@
-import { shell } from "electron";
+import { Menu, MenuItem, shell } from "electron";
 
 export function appMenu(store) {
   const isMacOS = process.platform === "darwin";
   return [
     ...(isMacOS ? [{ role: "appMenu" }] : []),
+    { role: "viewMenu" },
+    { role: "editMenu" },
     {
       role: "help",
       submenu: [
@@ -34,6 +36,49 @@ export function appMenu(store) {
       ],
     },
   ];
+}
+
+export function appContextMenu(params, mainWindow) {
+  const menu = new Menu();
+
+  for (const suggestion of params.dictionarySuggestions) {
+    menu.append(
+      new MenuItem({
+        label: suggestion,
+        click: () => mainWindow?.webContents.replaceMisspelling(suggestion),
+      }),
+    );
+  }
+
+  if (params.misspelledWord) {
+    menu.append(
+      new MenuItem({
+        label: "Add to dictionary",
+        click: () =>
+          mainWindow?.webContents.session.addWordToSpellCheckerDictionary(
+            params.misspelledWord,
+          ),
+      }),
+    );
+  }
+
+  const { canUndo, canRedo, canCut, canCopy, canPaste, canDelete, canSelectAll } =
+    params.editFlags;
+
+  const editable = params.isEditable;
+
+  menu.append(new MenuItem({ type: "separator" }));
+  menu.append(new MenuItem({ role: "undo", enabled: canUndo && editable }));
+  menu.append(new MenuItem({ role: "redo", enabled: canRedo && editable }));
+  menu.append(new MenuItem({ type: "separator" }));
+  menu.append(new MenuItem({ role: "cut", enabled: canCut && editable }));
+  menu.append(new MenuItem({ role: "copy", enabled: canCopy }));
+  menu.append(new MenuItem({ role: "paste", enabled: canPaste && editable }));
+  menu.append(new MenuItem({ role: "delete", enabled: canDelete && editable }));
+  menu.append(new MenuItem({ type: "separator" }));
+  menu.append(new MenuItem({ role: "selectAll", enabled: canSelectAll }));
+
+  menu.popup();
 }
 
 export function winBounds(store) {

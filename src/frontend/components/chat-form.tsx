@@ -8,6 +8,7 @@ import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../providers/chat";
 import { v4 as uuidv4 } from "uuid";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
+import ModelInfos from "./model-infos";
 
 type ObjectWithStrings = {
   [index: string]: any[];
@@ -165,9 +166,11 @@ const ChatForm = () => {
         </button>
       </div>
       <div className="flex justify-start gap-2 items-center w-full pt-3 px-1">
-        <span>
-          <p>{model ? model : "Missing model, read the instruction if needed"}</p>
-        </span>
+        {model ? (
+          <ModelInfos model={model} />
+        ) : (
+          "Missing model, read the instruction if needed"
+        )}
       </div>
       <div className="flex flex-col justify-center">
         <label
@@ -181,7 +184,8 @@ const ChatForm = () => {
           <textarea
             id="chat-input"
             ref={inputRef}
-            autoComplete="off"
+            autoComplete="on"
+            spellCheck={true}
             tabIndex={0}
             className={`
               w-full bg-transparent 

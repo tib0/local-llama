@@ -205,7 +205,7 @@ export class LlamaWrapper {
    *
    * @returns {LlamaCppInfo}
    */
-  public getInfos(): LlamaCppInfo {
+  public async getInfos(): Promise<LlamaCppInfo> {
     let infos = {};
 
     if (this.id) {
@@ -242,13 +242,13 @@ export class LlamaWrapper {
       infos = {
         ...infos,
         llama: {
-          vramState: this.llama.getVramState(),
-          deviceNames: this.llama.getGpuDeviceNames(),
+          vramState: await this.llama.getVramState(),
+          deviceNames: await this.llama.getGpuDeviceNames(),
         },
       };
     }
 
-    return infos;
+    return { ...infos };
   }
 
   /**

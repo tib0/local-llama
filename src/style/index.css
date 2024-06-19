@@ -6,6 +6,18 @@
 .user-select-none {
   user-select: none;
 }
+
+.code-block {
+  position: relative;
+}
+
+.copy-button {
+  position: absolute;
+  top: -14px;
+  right: -8px;
+  cursor: pointer;
+}
+
 p,
 span {
   font-size: 1.125rem /* 18px */;

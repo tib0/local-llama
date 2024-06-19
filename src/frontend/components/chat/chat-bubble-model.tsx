@@ -1,6 +1,6 @@
-import React from "react";
 import { SpeakerIcon } from "../../lib/icons";
 import { speechSynthesis } from "../../lib/textToSpeech";
+import { MarkdownRenderer } from "../markdown";
 
 const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => (
   <div
@@ -23,7 +23,9 @@ const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => (
       </div>
     </div>
     <div className="card-body p-0 text-left">
-      <div className="prose w-full max-w-full whitespace-pre-line">{text}</div>
+      <div className="prose prose-pre:bg-[#1E1E1E] prose-p:text-base prose-span:text-base w-full max-w-full ">
+        <MarkdownRenderer>{text}</MarkdownRenderer>
+      </div>
     </div>
   </div>
 );

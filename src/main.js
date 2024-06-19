@@ -1,11 +1,11 @@
-import { Menu, BrowserWindow, app, ipcMain, net, protocol, dialog } from "electron";
+import { Menu, BrowserWindow, app, ipcMain, net, protocol, dialog, clipboard } from "electron";
 import Store from "electron-store";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
-import { appMenu, winBounds } from "./Backend/appConfig";
+import { appMenu, appContextMenu, winBounds } from "./Backend/appConfig";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +41,12 @@ let promptSystem = `
 `;
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
+
+const availableModels = fs
+  .readdirSync(modelDir, { withFileTypes: true })
+  .filter((item) => !item.isDirectory())
+  .filter((item) => item.name.includes(".gguf"))
+  .map((item) => path.join(modelDir, item.name));
 
 app.whenReady().then(() => {
   protocol.handle("app", (req) => {
@@ -83,6 +89,10 @@ const createWindow = () => {
     });
   });
 
+  mainWindow.webContents.on("context-menu", (_event, params) => {
+    appContextMenu(params, mainWindow);
+  });
+
   function showFunc() {
     mainWindow.once("ready-to-show", () => {
       setTimeout(async function () {
@@ -104,9 +114,13 @@ ipcMain.handle("model-load", loadModel);
 
 ipcMain.handle("model-chat", chat);
 
+ipcMain.handle("model-info", getModelInfo);
+
 ipcMain.on("model-change", changeModel);
 
 ipcMain.on("model-clear-history", clearHistory);
+
+ipcMain.on("clipboard-copy", clipboardCopy);
 
 app.on("window-all-closed", () => {
   llamaNodeCPP = undefined;
@@ -119,17 +133,15 @@ app.on("activate", () => {
   }
 });
 
+async function clipboardCopy(_event, content) {
+  clipboard.writeText(content, "clipboard");
+}
+
 async function loadModel(_event, modelPath) {
   const modelDir = store.get("model_dir");
   if (!modelDir) {
     return "";
   }
-
-  const availableModels = fs
-    .readdirSync(modelDir, { withFileTypes: true })
-    .filter((item) => !item.isDirectory())
-    .filter((item) => item.name.includes(".gguf"))
-    .map((item) => path.join(modelDir, item.name));
 
   const selectedModelPath =
     modelPath ?? availableModels[0] ?? import.meta.env["VITE_LLAMA_MODELS_PATH"];
@@ -145,13 +157,13 @@ async function loadModel(_event, modelPath) {
 
   if (
     llamaNodeCPP.isReady() &&
-    llamaNodeCPP.getInfos().model !== undefined &&
-    selectedModelPath.includes(llamaNodeCPP.getInfos().model?.filename)
+    (await llamaNodeCPP.getInfos()).model !== undefined &&
+    selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename)
   ) {
     return selectedModelPath;
   }
 
-  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
+  if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeSession();
   }
@@ -166,20 +178,25 @@ async function loadModel(_event, modelPath) {
 }
 
 async function clearHistory() {
-  if (llamaNodeCPP.isReady() && llamaNodeCPP.getInfos().context !== undefined) {
+  if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
     llamaNodeCPP.clearHistory();
   }
 }
 
+async function getModelInfo() {
+  const i = await llamaNodeCPP.getInfos();
+  return JSON.stringify(i);
+}
+
 async function chat(_event, userMessage) {
-  let c;
-  if (llamaNodeCPP.isReady()) {
-    c = await llamaNodeCPP.prompt(userMessage);
+  if (!llamaNodeCPP.isReady()) {
+    return "No response";
   }
+  const c = await llamaNodeCPP.prompt(userMessage);
   return c ?? "No response";
 }
 
-async function changeModel(event) {
+async function changeModel() {
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: ["gguf"] }],
     properties: ["openFile"],
