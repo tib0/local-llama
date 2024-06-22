@@ -8,7 +8,7 @@ const ChatBubbleUser = ({ index, text }: { index: string; text: string }) => (
     `}
   >
     <div className="card-title p-0 text-left">
-      <div className="prose w-full max-w-full">{"Vous :"}</div>
+      <div className="prose w-full max-w-full">{"User :"}</div>
     </div>
     <div className="card-body p-0 text-left">
       <div className="prose w-full max-w-full">{text.toString()}</div>
