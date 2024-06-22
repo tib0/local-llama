@@ -332,9 +332,9 @@ export class LlamaWrapper {
       this.setStatus(loading, `Loading Llama lib`);
 
       this.llama = await this.module.getLlama({
-        logLevel: this.module.LlamaLogLevel.warn,
+        logLevel: this.module.LlamaLogLevel.debug,
         build: "never",
-        progressLogs: false,
+        progressLogs: true,
         gpu: gpu || "auto",
       });
 
@@ -402,10 +402,17 @@ export class LlamaWrapper {
     try {
       this.setStatus(loading, `Initializing session`);
 
-      const context = await this.model.createContext({ threads: 0, seed: 42, sequences: 2 });
+      const context = await this.model.createContext({ threads: 6 });
+      if (context.sequencesLeft === 0) {
+        throw new Error("No sequence left");
+      }
 
       this.session = new this.module.LlamaChatSession({
         contextSequence: context.getSequence(),
+        autoDisposeSequence: true,
+        chatWrapper: "auto",
+        contextShift: undefined,
+        forceAddSystemPrompt: true,
         systemPrompt: systemPrompt,
       });
 

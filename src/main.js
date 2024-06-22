@@ -123,6 +123,8 @@ ipcMain.on("model-clear-history", clearHistory);
 ipcMain.on("clipboard-copy", clipboardCopy);
 
 app.on("window-all-closed", () => {
+  llamaNodeCPP.disposeModel();
+  llamaNodeCPP.disposeSession();
   llamaNodeCPP = undefined;
   app.quit();
 });
@@ -164,6 +166,7 @@ async function loadModel(_event, modelPath) {
   }
 
   if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
+    llamaNodeCPP.clearHistory();
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeSession();
   }
