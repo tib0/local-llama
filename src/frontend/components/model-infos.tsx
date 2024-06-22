@@ -23,7 +23,7 @@ function ModelInfos({ model }: { model: string }) {
   return (
     <div className="collapse bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-xl rounded-xl">
       <input type="checkbox" className="peer" />
-      <div className="collapse-title">
+      <div className="collapse-title px-4 md:pr-8">
         <div className="flex items-center justify-between">
           <p className="text-lg text-left font-bold text-primary">{modelName}</p>
           <p className="text-lg text-right font-bold text-primary -rotate-90 peer-checked:-rotate-45">

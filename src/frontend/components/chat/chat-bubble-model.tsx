@@ -15,7 +15,7 @@ const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => (
     <div className="card-title p-0 text-left">
       <div className="prose w-full max-w-full">{"Model: "}</div>
       <div
-        className={`hover:cursor-pointer rounded-full w-4 h-4`}
+        className={`hover:cursor-pointer rounded-full w-6 h-6`}
         tabIndex={0}
         onClick={() => speechSynthesis(text)}
       >
