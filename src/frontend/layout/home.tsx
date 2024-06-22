@@ -5,7 +5,7 @@ import Footer from "../components/footer";
 export default function HomeLayout({ children }: { children: ReactNode }) {
   return (
     <div id="index" data-theme="">
-      <title>🦙 Local Llama 🦙</title>
+      <title>🦙🦙🦙</title>
       <Header />
       <main id="main">{children}</main>
       <Footer />

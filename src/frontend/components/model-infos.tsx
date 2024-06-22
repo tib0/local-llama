@@ -38,21 +38,21 @@ function ModelInfos({ model }: { model: string }) {
               <div className="stat">
                 <div className="stat-title ">Batch Size</div>
                 <div className="stat-value">
-                  {(modelInfo.context.batchSize * 1e-3).toFixed(1) + " Go"}
+                  {(modelInfo.context.batchSize * 1e-3).toFixed(1) + " GB"}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="stat-title">Context Size</div>
                 <div className="stat-value">
-                  {(modelInfo.context.contextSize * 1e-3).toFixed(1) + " Go"}
+                  {(modelInfo.context.contextSize * 1e-3).toFixed(1) + " GB"}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="stat-title">State Size</div>
                 <div className="stat-value">
-                  {(modelInfo.context.stateSize * 1e-9).toFixed(1) + " Go"}
+                  {(modelInfo.context.stateSize * 1e-9).toFixed(1) + " GB"}
                 </div>
               </div>
             </div>
@@ -62,7 +62,7 @@ function ModelInfos({ model }: { model: string }) {
               <div className="stat border-base-content/70 border-2 bg-base-300 bg-opacity-90 backdrop-blur-lg rounded-t-2xl sm:rounded-tr-none sm:rounded-bl-2xl">
                 <div className="stat-title text-primary">Train context size</div>
                 <div className="stat-value text-primary">
-                  {(modelInfo.model.trainContextSize * 1e-3).toFixed(1) + " Go"}
+                  {(modelInfo.model.trainContextSize * 1e-3).toFixed(1) + " GB"}
                 </div>
               </div>
               <div className="stat border-base-content/70 border-2 bg-base-content bg-opacity-90 backdrop-blur-lg rounded-t-none sm:rounded-tr-2xl sm:rounded-l-none">
@@ -78,21 +78,21 @@ function ModelInfos({ model }: { model: string }) {
               <div className="stat">
                 <div className="stat-title">Used VRAM</div>
                 <div className="stat-value">
-                  {(modelInfo.llama.vramState.used * 1e-9).toFixed(1) + " Go"}
+                  {(modelInfo.llama.vramState.used * 1e-9).toFixed(1) + " GB"}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="stat-title">Free VRAM</div>
                 <div className="stat-value">
-                  {(modelInfo.llama.vramState.free * 1e-9).toFixed(1) + " Go"}
+                  {(modelInfo.llama.vramState.free * 1e-9).toFixed(1) + " GB"}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="stat-title">Total VRAM</div>
                 <div className="stat-value">
-                  {(modelInfo.llama.vramState.total * 1e-9).toFixed(1) + " Go"}
+                  {(modelInfo.llama.vramState.total * 1e-9).toFixed(1) + " GB"}
                 </div>
               </div>
             </div>
