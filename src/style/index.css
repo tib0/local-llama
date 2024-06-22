@@ -28,7 +28,8 @@ h1 {
   line-height: 1;
 }
 a:focus,
-*:focus {
+*:focus,
+*:focus-visible {
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
   outline: 2px solid oklch(var(--p) / 0.4);
   outline-offset: 2px;
