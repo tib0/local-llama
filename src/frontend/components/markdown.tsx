@@ -28,7 +28,7 @@ export function MarkdownRenderer({ children: markdown }: MarkdownRendererProps) 
                 className="text-sm"
                 {...props}
               >
-                {String(children)}
+                {String(children).replace(/\n$/, "")}
               </SyntaxHighlighter>
             </div>
           ) : (
