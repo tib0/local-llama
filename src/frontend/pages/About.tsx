@@ -51,9 +51,9 @@ function About(): JSX.Element {
                     target="_blank"
                     className="font-black text-primary text-xl"
                   >
-                    withcatai
+                    giladgd
                   </a>
-                  {" have integrated llama.cpp to node module."}
+                  {" from withcatai team have integrated llama.cpp to node."}
                 </li>
                 <li>
                   <a
