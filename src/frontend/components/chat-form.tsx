@@ -6,19 +6,11 @@ import ChatBubbleSystem from "./chat/chat-bubble-system";
 import { MicIcon } from "../lib/icons";
 import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../providers/chat";
-import { v4 as uuidv4 } from "uuid";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 import ModelInfos from "./model-infos";
 
 type ObjectWithStrings = {
   [index: string]: any[];
-};
-
-const showNotification = (m?: string) => {
-  new Notification(`L³`, {
-    body: m ?? "Notification from L³",
-    tag: uuidv4(),
-  });
 };
 
 const ChatForm = () => {
@@ -89,14 +81,12 @@ const ChatForm = () => {
       type: "CLEAR_HISTORY",
     });
     window.electronAPI.clearHistory();
-    showNotification("History deleted!");
   }
 
   async function changeModel() {
     setLoading(true);
     window.electronAPI.changeModel();
     setLoading(false);
-    showNotification("Model updated!");
   }
 
   useEffect(() => {
@@ -130,14 +120,28 @@ const ChatForm = () => {
           <button
             type="button"
             className="btn btn-primary btn-sm shadow-xl"
-            aria-label="Change model"
+            aria-label="Load another model"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               changeModel();
             }}
           >
-            Change model
+            Model...
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            className="btn btn-primary btn-sm shadow-xl"
+            aria-label="Load conversation"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              //todo load one of stored conversation
+            }}
+          >
+            Conversation...
           </button>
           <button
             type="button"
@@ -151,19 +155,19 @@ const ChatForm = () => {
           >
             Clear
           </button>
+          <button
+            type="button"
+            className="btn btn-primary btn-sm shadow-xl"
+            aria-label="Save conversation"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              //todo save conversation
+            }}
+          >
+            Save
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary btn-sm shadow-xl"
-          aria-label="Change model"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            //todo
-          }}
-        >
-          Save
-        </button>
       </div>
       <div className="flex justify-start gap-2 items-center w-full pt-3 pb-1 px-0">
         {model ? (
