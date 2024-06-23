@@ -3,8 +3,27 @@
   "productName": "L³",
   "version": "0.0.1",
   "description": "L³ is an electron app that runs llama 3 models locally",
+  "author": {
+    "name": "Tib0",
+    "url": "https://github.com/tib0/local-chat.git"
+  },
+  "license": "CC-BY-NC-ND",
   "main": ".vite/build/main.js",
   "type": "module",
+  "keywords": [
+    "llama 3",
+    "node-llama-cpp",
+    "llama.cpp",
+    "electron",
+    "react",
+    "local",
+    "privacy",
+    "chat",
+    "chatbot",
+    "L³",
+    "gguf",
+    "AI"
+  ],
   "scripts": {
     "build": "npm run format && npm run lint && npm run typecheck && electron-forge package",
     "foli": "npm run format && npm run lint && npm run typecheck",
@@ -24,13 +43,8 @@
     "make:win-x64": "cross-env NODE_ENV=production electron-forge make --platform=win32 --arch=x64",
     "make:linux-x64": "cross-env NODE_ENV=production electron-forge make --platform=linux --arch=x64",
     "make:linux-arm": "cross-env NODE_ENV=production electron-forge make --platform=linux --arch=arm64",
-    "publish": "electron-forge publish",
     "start": "electron-forge start",
     "typecheck": "tsc --noEmit -p tsconfig.json --composite false"
-  },
-  "keywords": [],
-  "author": {
-    "name": "Tib0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.4.0",
