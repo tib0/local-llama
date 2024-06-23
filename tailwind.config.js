@@ -11,6 +11,9 @@ const config = {
           neutral: "#212221",
           primary: "#D48389",
           secondary: "#6ECBC3",
+          error: "#FF0000",
+          success: "#49E949",
+          warning: "#F9FF50",
           "#main": {
             "--gradient-light":
               "linear-gradient(187deg, rgba(248,253,239,1) 2%, rgba(203,110,118,0.05) 24%, rgba(203,110,118,0.05) 83%, rgba(248,253,239,1) 95%)",
