@@ -9,7 +9,7 @@ const config = {
         lemonade: {
           ...require("daisyui/src/theming/themes")["lemonade"],
           neutral: "#212221",
-          primary: "#cb6e76",
+          primary: "#D48389",
           secondary: "#6ECBC3",
           "#main": {
             "--gradient-light":
