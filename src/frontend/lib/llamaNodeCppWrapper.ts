@@ -335,7 +335,7 @@ export class LlamaWrapper {
         logLevel: this.module.LlamaLogLevel.debug,
         build: "never",
         progressLogs: true,
-        gpu: gpu || "auto",
+        gpu: gpu ?? "auto",
       });
 
       this.setStatus(ready);
