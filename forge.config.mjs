@@ -11,6 +11,8 @@ export default {
     {
       name: "@electron-forge/maker-squirrel",
       config: {
+        authors: "Tib0",
+        description: "L³ is an electron app that runs Llama 3 models locally",
         iconUrl: "app://./static/icon.png",
       },
     },
