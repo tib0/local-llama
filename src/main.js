@@ -12,9 +12,9 @@ const __dirname = path.dirname(__filename);
 const __cache = path.join(os.homedir(), ".cache/local-llama");
 const __modelsFolder = path.join(__cache, "models");
 const __logsFolder = path.join(__cache, "logs");
+const store = new Store();
 
 let llamaNodeCPP = new LlamaWrapper();
-const store = new Store();
 
 const modelDir = store.get("model_dir");
 if (!modelDir || !fs.existsSync(__modelsFolder)) {
@@ -30,15 +30,7 @@ if (!logDir || !fs.existsSync(__logsFolder)) {
   store.set("log_dir", defaultLogDir);
 }
 
-let promptSystem = `
-  Tu parles français.
-  Celui qui te parles est "l'interlocuteur".
-  Cette règle est la plus importante : tu dois être concis, tes réponses ne doivent pas être longues.
-  Si il est possible de répondre par un seul mot à une question répond par cet unique mot.
-  Tu es humble, si tu ne connais pas la réponse à une question exprime le clairement et demande des précisions pour t'aider à comprendre la question.
-  Tu es perspicace, si tu ne connais pas la réponse à une question donne des pistes de réflexion pour obtenir une réponse ailleur.
-  Si une conversation est supérieur à deux échanges intégre parfois dans tes réponses des questions pour mieux comprendre qui est ton "l'interlocuteur" si cela est nécessaire.
-`;
+const promptSystem = `You are an assistant to a human being.`;
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
 
@@ -47,6 +39,18 @@ const availableModels = fs
   .filter((item) => !item.isDirectory())
   .filter((item) => item.name.includes(".gguf"))
   .map((item) => path.join(modelDir, item.name));
+
+if (!store.get("selected_model") || !fs.existsSync(store.get("selected_model"))) {
+  if (availableModels.length === 0 || !fs.existsSync(availableModels[0])) {
+    store.set("selected_model", undefined);
+  }
+  store.set("selected_model", availableModels[0]);
+}
+
+if (!store.get("gpu")) {
+  store.set("gpu", "auto");
+  console.log(`GPuuu: ${store.get("gpu")}`);
+}
 
 app.whenReady().then(() => {
   protocol.handle("app", (req) => {
@@ -118,6 +122,10 @@ ipcMain.handle("model-info", getModelInfo);
 
 ipcMain.on("model-change", changeModel);
 
+ipcMain.on("model-change-gpu-use", changeModelGpuUse);
+
+ipcMain.on("model-change-system-prompt", changeModelSystemPrompt);
+
 ipcMain.on("model-clear-history", clearHistory);
 
 ipcMain.on("clipboard-copy", clipboardCopy);
@@ -140,13 +148,7 @@ async function clipboardCopy(_event, content) {
 }
 
 async function loadModel(_event, modelPath) {
-  const modelDir = store.get("model_dir");
-  if (!modelDir) {
-    return "";
-  }
-
-  const selectedModelPath =
-    modelPath ?? availableModels[0] ?? import.meta.env["VITE_LLAMA_MODELS_PATH"];
+  const selectedModelPath = modelPath ?? store.get("selected_model");
 
   if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
     return "";
@@ -154,13 +156,14 @@ async function loadModel(_event, modelPath) {
 
   if (!llamaNodeCPP.isReady()) {
     await llamaNodeCPP.loadModule();
-    await llamaNodeCPP.loadLlama();
+    await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
   }
 
   if (
     llamaNodeCPP.isReady() &&
     (await llamaNodeCPP.getInfos()).model !== undefined &&
-    selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename)
+    selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename) &&
+    store.get("gpu") === (await llamaNodeCPP.getInfos()).model?.gpu
   ) {
     return selectedModelPath;
   }
@@ -169,15 +172,35 @@ async function loadModel(_event, modelPath) {
     llamaNodeCPP.clearHistory();
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeSession();
+    await llamaNodeCPP.disposeLlama();
+    await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
   }
 
   await llamaNodeCPP.loadModel(selectedModelPath);
-  await llamaNodeCPP.initSession(promptSystem);
+  await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
 
   for (const window of BrowserWindow.getAllWindows()) {
     window.webContents.send("model-changed", selectedModelPath);
   }
-  return selectedModelPath;
+
+  store.set("selected_model", selectedModelPath);
+
+  if (llamaNodeCPP.isReady()) {
+    return selectedModelPath;
+  } else {
+    store.set("selected_model", selectedModelPath);
+    store.set("gpu", "auto");
+    return "";
+  }
+}
+
+async function changeModelGpuUse(_event, gpuUse) {
+  store.set("gpu", gpuUse);
+  loadModel();
+}
+
+async function changeModelSystemPrompt(_event, promptSystem) {
+  store.set("prompt_system", promptSystem);
 }
 
 async function clearHistory() {

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import ChatBubbleSkeleton from "./chat/chat-bubble-skeleton";
 import ChatBubbleModel from "./chat/chat-bubble-model";
 import ChatBubbleUser from "./chat/chat-bubble-user";
@@ -24,6 +24,9 @@ const ChatForm = () => {
     "currentModel",
   );
   const [model, setModel] = useState<string | undefined>(currentModel);
+  const [_currentGpuUse, setCurrentGpuUse] = usePersistentStorageValue<string | undefined>(
+    "currentGpuUse",
+  );
   const { dispatch } = useContext(ChatContext);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -93,6 +96,31 @@ const ChatForm = () => {
     setHistory(chatHistory);
   }, [chatHistory]);
 
+  const handleSelectGpuChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    switch (e.target?.value) {
+      case "auto":
+        setCurrentGpuUse("auto");
+        window.electronAPI.changeModelGpuUse("auto");
+        break;
+      case "cuda":
+        setCurrentGpuUse("cuda");
+        window.electronAPI.changeModelGpuUse("cuda");
+        break;
+      case "vulkan":
+        setCurrentGpuUse("vulkan");
+        window.electronAPI.changeModelGpuUse("vulkan");
+        break;
+      case "metal":
+        setCurrentGpuUse("metal");
+        window.electronAPI.changeModelGpuUse("metal");
+        break;
+      case "false":
+        setCurrentGpuUse("false");
+        window.electronAPI.changeModelGpuUse("false");
+        break;
+    }
+  };
+
   return (
     <form
       name="chatLlama"
@@ -116,7 +144,7 @@ const ChatForm = () => {
           items-start sm:items-center
         `}
       >
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <button
             type="button"
             className="btn btn-primary btn-sm shadow-xl"
@@ -129,6 +157,20 @@ const ChatForm = () => {
           >
             Model...
           </button>
+          <div className="flex gap-1 items-center rounded-md h-full">
+            <select
+              className="select select-bordered select-sm ml-1 shadow-xl"
+              onChange={handleSelectGpuChange}
+            >
+              <option value={"auto"} selected>
+                Auto
+              </option>
+              <option value={"metal"}>Use Metal</option>
+              <option value={"cuda"}>Use Cuda</option>
+              <option value={"vulkan"}>Use Vulkan</option>
+              <option value={"false"}>No GPU</option>
+            </select>
+          </div>
         </div>
         <div className="flex gap-2">
           <button
