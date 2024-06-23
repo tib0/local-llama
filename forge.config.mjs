@@ -11,7 +11,7 @@ export default {
     {
       name: "@electron-forge/maker-squirrel",
       config: {
-        iconUrl: "./static/icon.png",
+        iconUrl: "app://./static/icon.png",
       },
     },
     {
