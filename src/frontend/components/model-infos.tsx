@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
-import { ArrowDownIcon } from "../lib/icons";
 
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
@@ -25,19 +24,43 @@ function ModelInfos({ model }: { model: string }) {
     return () => clearInterval(interval.current);
   }, []);
 
+  const getStatusColor = (label: string) => {
+    switch (label) {
+      case "uninitialized":
+        return "bg-gray-700";
+      case "ready":
+        return "bg-green-500";
+      case "loading":
+        return "bg-yellow-400";
+      case "generating":
+        return "bg-orange-400";
+      case "error":
+        return "bg-red-500";
+      case "garbage":
+        return "bg-blue-500";
+    }
+  };
   return (
     <div className="collapse bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-xl rounded-xl">
       <input type="checkbox" className="peer" />
       <div className="collapse-title px-4 md:pr-8">
         <div className="flex items-center justify-between">
           <p className="text-lg text-left font-bold text-primary">{modelName}</p>
-          <p className="text-lg text-right font-bold text-primary -rotate-90 peer-checked:-rotate-45">
-            <ArrowDownIcon />
+
+          <p className="text-lg text-right font-bold text-primary -rotate-90">
+            {modelInfo && modelInfo.status.label && (
+              <div
+                className={`
+                animate-pulse rounded-full h-3 w-3 duration-1000 delay-1000 transition-colors
+                ${getStatusColor(modelInfo.status.label)}
+              `}
+              />
+            )}
           </p>
         </div>
       </div>
       <div className="collapse-content text-primary-content peer-checked:text-base-content">
-        <div className="flex flex-col gap-4 pb-4 text-xs md:text-lg items-center justify-stretch">
+        <div className="flex flex-col gap-4 text-xs md:text-lg items-center justify-stretch">
           {modelInfo && modelInfo.llama && (
             <div className="stats h-24 text-sm bg-opacity-50 backdrop-blur-lg border-primary/70 bordered border-2 w-full rounded-2xl text-center bg-primary text-primary-content stats-vertical sm:stats-horizontal shadow-lg">
               <div className="stat">
@@ -99,15 +122,38 @@ function ModelInfos({ model }: { model: string }) {
             </div>
           )}
         </div>
-        {model ? (
-          <p className="text-lg pb-4 font-light">{model}</p>
+
+        {modelInfo && modelInfo.status?.label && modelInfo.status.label === "error" ? (
+          <div
+            className={`p-2 bg-error/30 border border-error/70 rounded-md flex flex-col shadow-xl`}
+          >
+            <span className="text-lg font-semibold">{modelInfo.status.message}</span>
+            <span className="text-md font-light">
+              {"You might want to try the followings :"}
+              <ul className="list-disc ml-8">
+                <li>{"Update the model by clicking on model button"}</li>
+                <li>{"Change the gpu processor from the drop down list"}</li>
+                <li>{"Clear the history, model migth have reached the max context size"}</li>
+                <li>
+                  {"Free up some memory by closing other applications or background services"}
+                </li>
+                <li>{"Restart the application"}</li>
+              </ul>
+            </span>
+          </div>
+        ) : model || model === "" ? (
+          <p className="text-lg pt-4 font-light">{model}</p>
         ) : (
-          <p className="text-lg pb-4 font-light">{"Missing model"}</p>
+          <p className="text-lg pt-4 font-light">{"Missing model"}</p>
         )}
-        <div className="flex flex-col sm:flex-row justify-between">
+
+        <div className="flex flex-col sm:flex-row justify-between pt-4">
           {modelInfo && modelInfo.llama && (
-            <span className="text-sm font-bold italic">{modelInfo.llama.deviceNames}</span>
+            <span className="text-sm font-bold italic">
+              {modelInfo.llama.deviceNames + " - " + modelInfo.llama.gpu}
+            </span>
           )}
+
           {modelInfo && <span className="text-sm font-extralight italic">{modelInfo.id}</span>}
         </div>
       </div>

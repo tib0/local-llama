@@ -54,6 +54,20 @@ export interface LlamaCppInfo {
   id?: string;
 
   /**
+   * Status of the llama process
+   */
+  status?: {
+    /**
+     * Status label
+     */
+    label?: string;
+    /**
+     * Message related to status
+     */
+    message?: string;
+  };
+
+  /**
    * Information about the model use
    */
   model?: {
@@ -97,6 +111,10 @@ export interface LlamaCppInfo {
    * Information about Llama
    */
   llama?: {
+    /**
+     * GPU Processor 'vulkan' 'metal' 'cuda' false
+     */
+    gpu: string | any;
     /**
      * VRAM state information
      */
@@ -215,6 +233,16 @@ export class LlamaWrapper {
       };
     }
 
+    if (this.status) {
+      infos = {
+        ...infos,
+        status: {
+          label: this.status.status.text,
+          message: this.status.message || "",
+        },
+      };
+    }
+
     if (this.model) {
       infos = {
         ...infos,
@@ -242,6 +270,7 @@ export class LlamaWrapper {
       infos = {
         ...infos,
         llama: {
+          gpu: this.llama.gpu,
           vramState: await this.llama.getVramState(),
           deviceNames: await this.llama.getGpuDeviceNames(),
         },
@@ -259,7 +288,7 @@ export class LlamaWrapper {
   public disposeSession() {
     if (!this.session) {
       this.setStatus(error, String("disposeSession: No session found."));
-      throw new Error(`Ignoring attempt to dispose session, no session found.`);
+      return;
     }
     this.session = undefined;
     this.setStatus(garbage, String("Session disposed."));
@@ -273,10 +302,24 @@ export class LlamaWrapper {
   public disposeModel() {
     if (!this.model) {
       this.setStatus(error, String("disposeModel: No model found."));
-      throw new Error(`Ignoring attempt to dispose model, no model found.`);
+      return;
     }
     this.model = undefined;
     this.setStatus(garbage, String("Model disposed."));
+  }
+
+  /**
+   * Disposes llama.
+   *
+   * @throws {Error} If no llama is found.
+   */
+  public disposeLlama() {
+    if (!this.llama) {
+      this.setStatus(error, String("disposeLlama: No llama found."));
+      return;
+    }
+    this.llama = undefined;
+    this.setStatus(garbage, String("Llama disposed."));
   }
 
   /**
@@ -287,11 +330,11 @@ export class LlamaWrapper {
   public clearHistory() {
     if (!this.session) {
       this.setStatus(error, String("disposeSession: No session found."));
-      throw new Error(`Ignoring attempt to clear history, no session found.`);
+      return;
     }
     if (!this.session.sequence) {
       this.setStatus(error, String("disposeSession: No sequence found for the session."));
-      throw new Error(`Ignoring attempt to clear history, no sequence found for the session.`);
+      return;
     }
     this.session.sequence.clearHistory();
     this.setStatus(ready, String("History cleared."));
@@ -309,9 +352,8 @@ export class LlamaWrapper {
       this.module = await llamaModule();
       this.setStatus(ready);
     } catch (err) {
-      console.error(err);
       this.setStatus(error, String("loadModule:" + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -325,24 +367,31 @@ export class LlamaWrapper {
   async loadLlama(gpu?: Gpu) {
     if (!this.module) {
       this.setStatus(error, String("loadLlama: No module found."));
-      throw new Error(`Ignoring attempt to load llama, no module found.`);
+      return;
     }
 
     try {
       this.setStatus(loading, `Loading Llama lib`);
 
       this.llama = await this.module.getLlama({
-        logLevel: this.module.LlamaLogLevel.debug,
+        logLevel: this.module.LlamaLogLevel.warn,
         build: "never",
-        progressLogs: true,
+        progressLogs: false,
         gpu: gpu ?? "auto",
       });
 
+      this.llama.logger = (level, message) => {
+        if (
+          level === this.module.LlamaLogLevel.warn ||
+          level === this.module.LlamaLogLevel.error
+        )
+          console.log(level, message);
+      };
+
       this.setStatus(ready);
     } catch (err) {
-      console.error(err);
       this.setStatus(error, String("loadLlama: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -356,15 +405,15 @@ export class LlamaWrapper {
   async loadModel(modelPath: string) {
     if (!modelPath || modelPath === "") {
       this.setStatus(error, String("loadModel: No path provided."));
-      throw new Error(`Ignoring attempt to load model, no path provided.`);
+      return;
     }
     if (!this.module) {
       this.setStatus(error, String("loadModel: No module found."));
-      throw new Error(`Ignoring attempt to load model, no module found.`);
+      return;
     }
     if (!this.llama) {
       this.setStatus(error, String("loadModel: No llama lib loaded."));
-      throw new Error(`Ignoring attempt to load model, no llama lib loaded.`);
+      return;
     }
 
     try {
@@ -376,9 +425,8 @@ export class LlamaWrapper {
 
       this.setStatus(ready);
     } catch (err) {
-      console.error(err);
       this.setStatus(error, String("loadModel: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -392,11 +440,11 @@ export class LlamaWrapper {
   async initSession(systemPrompt: string) {
     if (!this.model) {
       this.setStatus(error, String("initSession: No model loaded."));
-      throw new Error(`Ignoring attempt to initialize session, no model loaded.`);
+      return;
     }
     if (!this.module) {
       this.setStatus(error, String("initSession: No module found."));
-      throw new Error(`Ignoring attempt to initialize session, no module found.`);
+      return;
     }
 
     try {
@@ -404,7 +452,7 @@ export class LlamaWrapper {
 
       const context = await this.model.createContext({ threads: 6 });
       if (context.sequencesLeft === 0) {
-        throw new Error("No sequence left");
+        return;
       }
 
       this.session = new this.module.LlamaChatSession({
@@ -419,7 +467,7 @@ export class LlamaWrapper {
       this.setStatus(ready);
     } catch (err) {
       this.setStatus(error, String("initSession: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -434,7 +482,7 @@ export class LlamaWrapper {
   public async prompt(message: string, onToken?: (chunk: string) => void): Promise<string> {
     if (this.session === undefined) {
       this.setStatus(error, String("prompt: No session found."));
-      throw new Error("Ignoring attempt to prompt, no session found");
+      return;
     }
 
     this.setStatus(generating);
@@ -454,7 +502,7 @@ export class LlamaWrapper {
     } catch (err) {
       this.errorCallback();
       this.setStatus(error, String("prompt: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -467,7 +515,7 @@ export class LlamaWrapper {
   public async getHistory(): Promise<ChatHistoryItem[]> {
     if (this.session === undefined) {
       this.setStatus(error, String("getHistory: No session found."));
-      throw new Error("Ignoring history retrieval, no session found");
+      return;
     }
 
     this.setStatus(generating);
@@ -479,7 +527,7 @@ export class LlamaWrapper {
     } catch (err) {
       this.errorCallback();
       this.setStatus(error, String("getHistory: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 
@@ -493,7 +541,7 @@ export class LlamaWrapper {
   public async setHistory(chatHistoryItem: ChatHistoryItem[]): Promise<void> {
     if (this.session === undefined) {
       this.setStatus(error, String("getHistory: No session found."));
-      throw new Error("Ignoring history update, no session found");
+      return;
     }
 
     this.setStatus(loading, "Loading chat history");
@@ -504,7 +552,7 @@ export class LlamaWrapper {
     } catch (err) {
       this.errorCallback();
       this.setStatus(error, String("setHistory: " + err.message));
-      throw new Error(err);
+      return;
     }
   }
 }
