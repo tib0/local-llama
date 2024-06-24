@@ -197,13 +197,20 @@ async function loadModel(_event, modelPath) {
 
 async function changeModelGpuUse(_event, gpuUse) {
   store.set("gpu", gpuUse);
+  llamaNodeCPP.clearHistory();
+  await llamaNodeCPP.disposeSession();
+  await llamaNodeCPP.disposeModel();
+  await llamaNodeCPP.disposeLlama();
+  await loadModel();
 }
 
 async function changeModelSystemPrompt(_event, promptSystem) {
   store.set("prompt_system", promptSystem);
   llamaNodeCPP.clearHistory();
   await llamaNodeCPP.disposeSession();
-  await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
+  await llamaNodeCPP.disposeModel();
+  await llamaNodeCPP.disposeLlama();
+  await loadModel();
 }
 
 async function clearHistory() {
