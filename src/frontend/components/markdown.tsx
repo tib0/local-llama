@@ -1,15 +1,17 @@
-import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { PrismAsync as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import CopyButton from "./copy-button";
+import { lazy, Suspense } from "react";
+import Markdown from "react-markdown";
 
 type MarkdownRendererProps = {
   children: string;
 };
 
-export function MarkdownRenderer({ children: markdown }: MarkdownRendererProps) {
+const MarkdownRenderer = ({ children: markdown }: MarkdownRendererProps) => {
+  const CopyButton = lazy(() => import("./copy-button"));
+
   return (
     <Markdown
       remarkPlugins={[remarkGfm]}
@@ -19,7 +21,13 @@ export function MarkdownRenderer({ children: markdown }: MarkdownRendererProps) 
           const match = /language-(\w+)/.exec(className || "");
           return !inline && match ? (
             <div className="code-block">
-              <CopyButton code={String(children)} />
+              <Suspense
+                fallback={
+                  <div className="skeleton h-6 w-6 shrink-0 rounded-full copy-button"></div>
+                }
+              >
+                <CopyButton code={String(children)} />
+              </Suspense>
               <SyntaxHighlighter
                 wrapLines={true}
                 style={vscDarkPlus}
@@ -42,4 +50,6 @@ export function MarkdownRenderer({ children: markdown }: MarkdownRendererProps) 
       {markdown}
     </Markdown>
   );
-}
+};
+
+export default MarkdownRenderer;

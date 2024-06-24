@@ -3,7 +3,8 @@ import { ClipboardIcon } from "../lib/icons";
 type Props = {
   code: string;
 };
-function CopyButton({ code }: Props) {
+
+const CopyButton = ({ code }: Props) => {
   function handleClick() {
     if (window && window.electronAPI) window.electronAPI.clipboardCopy(code);
   }
@@ -19,6 +20,6 @@ function CopyButton({ code }: Props) {
       <ClipboardIcon />
     </button>
   );
-}
+};
 
 export default CopyButton;
