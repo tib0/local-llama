@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
 import React from "react";
 import HomeLayout from "../layout/home";
+import images from "../lib/images";
 
 function About(): JSX.Element {
   return (
     <HomeLayout>
       <React.Fragment>
-        <div
-          className={`min-h-[calc(100vh-5rem)] text-center
-          `}
-        >
-          <h1 className="py-8 font-black">About...</h1>
+        <div className={`min-h-[calc(100vh-5rem)] text-center`}>
+          <div className="flex justify-center">
+            <img className="max-w-64 pt-8" src={images.logo} />
+          </div>
           <div>
             <div className="py-2">
               <p>This recreational project aim to help you run LLM models locally 🚀</p>

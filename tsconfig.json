@@ -11,7 +11,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "sourceMap": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "paths": {
+      "@assets/*": ["./src/assets/*"],
+    },
   },
   "include": ["src"]
 }
