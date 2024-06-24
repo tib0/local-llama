@@ -48,6 +48,9 @@ const ChatForm = () => {
       }
       setModel(modelPath);
       setCurrentModel(modelPath);
+      dispatch({
+        type: "CLEAR_HISTORY",
+      });
     });
   }, [loading]);
 
@@ -88,9 +91,6 @@ const ChatForm = () => {
 
   async function changeModel() {
     setLoading(true);
-    dispatch({
-      type: "CLEAR_HISTORY",
-    });
     window.electronAPI.changeModel();
     setLoading(false);
   }
