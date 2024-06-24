@@ -5,27 +5,28 @@ import os from "os";
 import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
-import { appMenu, appContextMenu, winBounds } from "./Backend/appConfig";
+import { appMenu, appContextMenu, winBounds } from "./backend/appConfig";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const __cache = path.join(os.homedir(), ".cache/local-llama");
-const __modelsFolder = path.join(__cache, "models");
-const __logsFolder = path.join(__cache, "logs");
+const cache = path.join(os.homedir(), ".cache/local-llama");
+const modelsFolder = path.join(cache, "models");
+const logsFolder = path.join(cache, "logs");
+
 const store = new Store();
 
 let llamaNodeCPP = new LlamaWrapper();
 
 const modelDir = store.get("model_dir");
-if (!modelDir || !fs.existsSync(__modelsFolder)) {
-  const defaultModelDir = __modelsFolder;
+if (!modelDir || !fs.existsSync(modelsFolder)) {
+  const defaultModelDir = modelsFolder;
   fs.mkdirSync(defaultModelDir, { recursive: true });
   store.set("model_dir", defaultModelDir);
 }
 
 const logDir = store.get("log_dir");
-if (!logDir || !fs.existsSync(__logsFolder)) {
-  const defaultLogDir = __logsFolder;
+if (!logDir || !fs.existsSync(logsFolder)) {
+  const defaultLogDir = logsFolder;
   fs.mkdirSync(defaultLogDir, { recursive: true });
   store.set("log_dir", defaultLogDir);
 }
@@ -196,11 +197,13 @@ async function loadModel(_event, modelPath) {
 
 async function changeModelGpuUse(_event, gpuUse) {
   store.set("gpu", gpuUse);
-  loadModel();
 }
 
 async function changeModelSystemPrompt(_event, promptSystem) {
   store.set("prompt_system", promptSystem);
+  llamaNodeCPP.clearHistory();
+  await llamaNodeCPP.disposeSession();
+  await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
 }
 
 async function clearHistory() {

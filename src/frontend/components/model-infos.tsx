@@ -1,8 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
+import { MicIcon } from "../lib/icons";
+import { ChatContext } from "../providers/chat";
 
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
+  const [systemPrompt, setSystemPrompt] = useState<string>(null);
+  const [checked, setChecked] = useState<boolean>(false);
 
   const modelName =
     model.split("/").length > 0
@@ -15,12 +19,12 @@ function ModelInfos({ model }: { model: string }) {
   }
 
   const interval = useRef(null);
+  const { dispatch } = useContext(ChatContext);
 
   useEffect(() => {
     interval.current = setInterval(async () => {
       await getModelInfo();
     }, 500);
-
     return () => clearInterval(interval.current);
   }, []);
 
@@ -40,14 +44,31 @@ function ModelInfos({ model }: { model: string }) {
         return "bg-blue-500";
     }
   };
+
+  async function sendSystemPrompt() {
+    await window.electronAPI.changeModelSystemPrompt(systemPrompt);
+    const mi = await window.electronAPI.getModelInfo();
+    setModelInfo(JSON.parse(mi) as LlamaCppInfo);
+    setSystemPrompt("");
+    setChecked(false);
+    dispatch({
+      type: "CLEAR_HISTORY",
+    });
+  }
+
   return (
     <div className="collapse bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-xl rounded-xl">
-      <input type="checkbox" className="peer" />
+      <input
+        type="checkbox"
+        className="peer"
+        checked={checked}
+        onClick={() => setChecked(!checked)}
+      />
       <div className="collapse-title px-4 md:pr-8">
         <div className="flex items-center justify-between">
           <p className="text-lg text-left font-bold text-primary">{modelName}</p>
 
-          <p className="text-lg text-right font-bold text-primary -rotate-90">
+          <div className="text-lg text-right font-bold text-primary -rotate-90">
             {modelInfo && modelInfo.status.label && (
               <div
                 className={`
@@ -56,7 +77,7 @@ function ModelInfos({ model }: { model: string }) {
               `}
               />
             )}
-          </p>
+          </div>
         </div>
       </div>
       <div className="collapse-content text-primary-content peer-checked:text-base-content">
@@ -142,12 +163,102 @@ function ModelInfos({ model }: { model: string }) {
             </span>
           </div>
         ) : model || model === "" ? (
-          <p className="text-lg pt-4 font-light">{model}</p>
+          <p className="text-lg py-4 font-light">{model}</p>
         ) : (
-          <p className="text-lg pt-4 font-light">{"Missing model"}</p>
+          <p className="text-lg py-4 font-light">{"Missing model"}</p>
         )}
 
-        <div className="flex flex-col sm:flex-row justify-between pt-4">
+        <div className="collapse bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-xl rounded-xl">
+          <input type="checkbox" />
+          <div className="collapse-title text-xl font-extrabold">Set system prompt...</div>
+          <div className="collapse-content">
+            <div className="prose">
+              <div className="font-semibold">
+                This is the current system prompt, input a new one below if you want, be
+                creative ! The session will be reseted after System Prompt update.
+              </div>
+              <blockquote>
+                {modelInfo && modelInfo.context && (
+                  <>
+                    <p className="font-light text-base-content/60">
+                      {modelInfo.context.systemPrompt}
+                    </p>
+                  </>
+                )}
+              </blockquote>
+            </div>
+            <div className="flex flex-col justify-center">
+              <label
+                className={`
+                  sticky z-10 top-[4.2rem] bg-base-100 h-20 my-2
+                  border-primary/30 bordered border-2 
+                  shadow-xl rounded-xl flex items-center 
+                  transition-all justify-between
+                `}
+              >
+                <textarea
+                  id="system-prompt-input"
+                  autoComplete="on"
+                  spellCheck={true}
+                  tabIndex={0}
+                  className={`
+                    w-full bg-transparent 
+                    textarea py-2 h-full textarea-ghost
+                    focus:border-none focus:outline-none text-base leading-7
+                    resize-none disabled:bg-transparent disabled:border-none
+                  `}
+                  rows={2}
+                  placeholder={`Start typing here, and press enter or click on the button`}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    {
+                      if (e.which == 13) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        sendSystemPrompt();
+                      }
+                    }
+                  }}
+                  value={systemPrompt}
+                  //disabled={loading}
+                />
+                <div className="hidden justify-center sm:flex w-2/12">
+                  <kbd
+                    role="button"
+                    className="kbd kbd-sm hover:cursor-pointer focus:ring-primary/30"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      sendSystemPrompt();
+                    }}
+                  >
+                    Enter
+                  </kbd>
+                </div>
+                <div className="flex justify-center sm:hidden w-2/12">
+                  <button
+                    type="button"
+                    className={`
+                      focus:ring-primary/40
+                      focus:ring
+                      focus:outline-none
+                    `}
+                    aria-label="Start voice recording"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      sendSystemPrompt();
+                    }}
+                  >
+                    <MicIcon />
+                  </button>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between pt-4 text-base-content/20">
           {modelInfo && modelInfo.llama && (
             <span className="text-sm font-bold italic">
               {modelInfo.llama.deviceNames + " - " + modelInfo.llama.gpu}

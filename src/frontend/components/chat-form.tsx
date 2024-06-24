@@ -1,6 +1,5 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import ChatBubbleSkeleton from "./chat/chat-bubble-skeleton";
-import ChatBubbleModel from "./chat/chat-bubble-model";
 import ChatBubbleUser from "./chat/chat-bubble-user";
 import ChatBubbleSystem from "./chat/chat-bubble-system";
 import { MicIcon } from "../lib/icons";
@@ -8,6 +7,7 @@ import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../providers/chat";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 import ModelInfos from "./model-infos";
+import ChatBubbleModel from "./chat/chat-bubble-model";
 
 type ObjectWithStrings = {
   [index: string]: any[];
@@ -88,6 +88,9 @@ const ChatForm = () => {
 
   async function changeModel() {
     setLoading(true);
+    dispatch({
+      type: "CLEAR_HISTORY",
+    });
     window.electronAPI.changeModel();
     setLoading(false);
   }
@@ -161,10 +164,9 @@ const ChatForm = () => {
             <select
               className="select select-bordered select-sm ml-1 shadow-xl"
               onChange={handleSelectGpuChange}
+              defaultValue="auto"
             >
-              <option value={"auto"} selected>
-                Auto
-              </option>
+              <option value={"auto"}>Auto</option>
               <option value={"metal"}>Use Metal</option>
               <option value={"cuda"}>Use Cuda</option>
               <option value={"vulkan"}>Use Vulkan</option>
@@ -176,14 +178,14 @@ const ChatForm = () => {
           <button
             type="button"
             className="btn btn-primary btn-sm shadow-xl"
-            aria-label="Load conversation"
+            aria-label="Load old conversation from file"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               //todo load one of stored conversation
             }}
           >
-            Conversation...
+            History...
           </button>
           <button
             type="button"
@@ -221,7 +223,7 @@ const ChatForm = () => {
       <div className="flex flex-col justify-center">
         <label
           className={`
-            sticky z-10 top-16 bg-base-100 h-20 my-2
+            sticky z-10 top-[4.2rem] bg-base-100 h-20 my-2
             border-primary/30 bordered border-2 
             shadow-xl rounded-xl flex items-center 
             transition-all justify-between

@@ -105,6 +105,10 @@ export interface LlamaCppInfo {
      * Total number of sequences
      */
     totalSequences: number;
+    /**
+     * System Prompt
+     */
+    systemPrompt: string;
   };
 
   /**
@@ -162,6 +166,7 @@ export class LlamaWrapper {
   private abortController: AbortController;
   private module: typeof import("node-llama-cpp") | undefined;
   private llama: Llama | undefined;
+  public systemPrompt: string | undefined;
 
   /**
    * Initializes the wrapper with an ID and sets the status to uninitialized.
@@ -262,6 +267,7 @@ export class LlamaWrapper {
           sequencesLeft: this.session.context.sequencesLeft,
           stateSize: this.session.context.stateSize,
           totalSequences: this.session.context.totalSequences,
+          systemPrompt: this.systemPrompt,
         },
       };
     }
@@ -450,7 +456,7 @@ export class LlamaWrapper {
     try {
       this.setStatus(loading, `Initializing session`);
 
-      const context = await this.model.createContext({ threads: 6 });
+      const context = await this.model.createContext({ threads: 8 });
       if (context.sequencesLeft === 0) {
         return;
       }
@@ -463,10 +469,11 @@ export class LlamaWrapper {
         forceAddSystemPrompt: true,
         systemPrompt: systemPrompt,
       });
-
+      this.systemPrompt = systemPrompt;
       this.setStatus(ready);
     } catch (err) {
       this.setStatus(error, String("initSession: " + err.message));
+      this.systemPrompt = "";
       return;
     }
   }
