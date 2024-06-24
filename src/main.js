@@ -17,6 +17,11 @@ const store = new Store();
 
 let llamaNodeCPP = new LlamaWrapper();
 
+let isSingleInstance = app.requestSingleInstanceLock();
+if (!isSingleInstance) {
+  app.quit();
+}
+
 const modelDir = store.get("model_dir");
 if (!modelDir || !fs.existsSync(modelsFolder)) {
   const defaultModelDir = modelsFolder;
@@ -92,6 +97,13 @@ const createWindow = () => {
       isMaximized: mainWindow.isMaximized(),
       ...mainWindow.getNormalBounds(),
     });
+  });
+
+  app.on("second-instance", (_event, _argv, _cwd) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
   });
 
   mainWindow.webContents.on("context-menu", (_event, params) => {
