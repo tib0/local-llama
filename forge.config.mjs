@@ -2,6 +2,7 @@ export default {
   buildIdentifier: "esm",
   defaultResolved: true,
   packagerConfig: {
+    compression: "store",
     appCategoryType: "public.app-category.utilities",
     icon: "./static/icon",
     darwinDarkModeSupport: "true",
