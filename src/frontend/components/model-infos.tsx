@@ -3,12 +3,14 @@ import debounce from "lodash.debounce";
 import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
 import { MicIcon } from "../lib/icons";
 import { ChatContext } from "../providers/chat";
+import images from "../lib/images";
 
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
   const [systemPrompt, setSystemPrompt] = useState<string>("");
   const [temperature, setTemperature] = useState<number>(null);
   const [expandedView, setExpandedView] = useState<boolean>(false);
+  const [tempIco, setTempIco] = useState<any>(null);
 
   const modelName =
     model.split("/").length > 0
@@ -35,6 +37,32 @@ function ModelInfos({ model }: { model: string }) {
 
   useEffect(() => {
     if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50);
+
+    if (temperature) {
+      switch (true) {
+        case temperature === 0:
+          setTempIco(images.fire);
+          break;
+        case temperature > 80:
+          setTempIco(images.red);
+          break;
+        case temperature > 50 && temperature < 81:
+          setTempIco(images.pink);
+          break;
+        case temperature > 35 && temperature < 51:
+          setTempIco(images.green);
+          break;
+        case temperature > 15 && temperature < 36:
+          setTempIco(images.gray);
+          break;
+        case temperature > 0 && temperature < 16:
+          setTempIco(images.blue);
+          break;
+        default:
+          setTempIco(images.fire);
+          break;
+      }
+    }
   }, [modelInfo?.llama?.temperature, temperature]);
 
   const getStatusColor = (label: string) => {
@@ -315,8 +343,9 @@ function ModelInfos({ model }: { model: string }) {
       </div>
       {modelInfo && modelInfo.llama && typeof modelInfo.llama.temperature === "number" && (
         <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
-          <div className="flex-grow-0 w-16 text-center font-black text-lg">
-            {temperature / 50}
+          <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
+            {/* {temperature / 50} */}
+            <img className="w-7 h-7" src={tempIco} />
           </div>
           <div className="flex-grow-1 w-full">
             <input
