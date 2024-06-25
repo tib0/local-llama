@@ -344,8 +344,10 @@ function ModelInfos({ model }: { model: string }) {
       {modelInfo && modelInfo.llama && typeof modelInfo.llama.temperature === "number" && (
         <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
           <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
-            {/* {temperature / 50} */}
-            <img className="w-7 h-7" src={tempIco} />
+            <img
+              className="w-7 h-8 bg-white/90 mb-1 rounded-full border-[3px] border-primary"
+              src={tempIco}
+            />
           </div>
           <div className="flex-grow-1 w-full">
             <input
