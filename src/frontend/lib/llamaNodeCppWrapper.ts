@@ -462,17 +462,17 @@ export class LlamaWrapper {
     try {
       this.setStatus(loading, `Initializing session`);
 
-      const context = await this.model.createContext({ threads: 6 });
+      const context = await this.model.createContext({ threads: 8 });
       if (context.sequencesLeft === 0) {
         return;
       }
 
       this.session = new this.module.LlamaChatSession({
         contextSequence: context.getSequence(),
-        autoDisposeSequence: true,
+        autoDisposeSequence: false,
         chatWrapper: "auto",
         contextShift: undefined,
-        forceAddSystemPrompt: true,
+        forceAddSystemPrompt: false,
         systemPrompt: systemPrompt,
       });
       this.systemPrompt = systemPrompt;
