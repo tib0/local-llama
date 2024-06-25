@@ -120,6 +120,10 @@ export interface LlamaCppInfo {
      */
     gpu: string | any;
     /**
+     * Temperature defined
+     */
+    temperature: number;
+    /**
      * VRAM state information
      */
     vramState?: {
@@ -167,6 +171,7 @@ export class LlamaWrapper {
   private module: typeof import("node-llama-cpp") | undefined;
   private llama: Llama | undefined;
   public systemPrompt: string | undefined;
+  public temperature: number | undefined;
 
   /**
    * Initializes the wrapper with an ID and sets the status to uninitialized.
@@ -279,6 +284,7 @@ export class LlamaWrapper {
           gpu: this.llama.gpu,
           vramState: await this.llama.getVramState(),
           deviceNames: await this.llama.getGpuDeviceNames(),
+          temperature: this.temperature,
         },
       };
     }
@@ -456,7 +462,7 @@ export class LlamaWrapper {
     try {
       this.setStatus(loading, `Initializing session`);
 
-      const context = await this.model.createContext({ threads: 8 });
+      const context = await this.model.createContext({ threads: 6 });
       if (context.sequencesLeft === 0) {
         return;
       }
@@ -483,10 +489,15 @@ export class LlamaWrapper {
    *
    * @param {string} message - The prompt to send to the Llama library.
    * @param {(chunk: string) => void} [onToken] - A callback function for tokenized responses (optional).
+   * @param {{ temperature: number, topK: number, topP: number, minP: number }} [options] - Options for the prompt (optional).
    * @returns {Promise<string>} A promise that resolves with the response from the Llama library.
    * @throws {Error} If an error occurs during prompting.
    */
-  public async prompt(message: string, onToken?: (chunk: string) => void): Promise<string> {
+  public async prompt(
+    message: string,
+    onToken?: (chunk: string) => void,
+    options?: { temperature?: number; topK?: number; topP?: number; minP?: number },
+  ): Promise<string> {
     if (this.session === undefined) {
       this.setStatus(error, String("prompt: No session found."));
       return;
@@ -503,7 +514,9 @@ export class LlamaWrapper {
           }
         },
         signal: this.abortController.signal,
+        ...options,
       });
+      this.temperature = options.temperature;
       this.setStatus(ready);
       return answer;
     } catch (err) {

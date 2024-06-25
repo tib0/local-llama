@@ -55,7 +55,10 @@ if (!store.get("selected_model") || !fs.existsSync(store.get("selected_model")))
 
 if (!store.get("gpu")) {
   store.set("gpu", "auto");
-  console.log(`GPuuu: ${store.get("gpu")}`);
+}
+
+if (!store.get("temperature")) {
+  store.set("temperature", 0);
 }
 
 app.whenReady().then(() => {
@@ -114,6 +117,7 @@ const createWindow = () => {
     mainWindow.once("ready-to-show", () => {
       setTimeout(async function () {
         await loadModel();
+        llamaNodeCPP.temperature = store.get("temperature");
         splash.destroy();
         mainWindow.show();
       }, 1500);
@@ -138,6 +142,8 @@ ipcMain.on("model-change", changeModel);
 ipcMain.on("model-change-gpu-use", changeModelGpuUse);
 
 ipcMain.on("model-change-system-prompt", changeModelSystemPrompt);
+
+ipcMain.on("model-change-temperature", changeTemperature);
 
 ipcMain.on("model-clear-history", clearHistory);
 
@@ -225,6 +231,10 @@ async function changeModelSystemPrompt(_event, promptSystem) {
   await loadModel();
 }
 
+async function changeTemperature(_event, temperature) {
+  store.set("temperature", temperature);
+}
+
 async function clearHistory() {
   if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
     llamaNodeCPP.clearHistory();
@@ -240,7 +250,10 @@ async function chat(_event, userMessage) {
   if (!llamaNodeCPP.isReady()) {
     return "No response";
   }
-  const c = await llamaNodeCPP.prompt(userMessage);
+  const temp = store.get("temperature");
+  const c = await llamaNodeCPP.prompt(userMessage, undefined, {
+    temperature: temp,
+  });
   return c ?? "No response";
 }
 

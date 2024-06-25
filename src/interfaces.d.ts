@@ -16,6 +16,7 @@ export interface IElectronAPI {
   changeModel: () => Promise<string>;
   changeModelGpuUse: (g: string) => Promise<void>;
   changeModelSystemPrompt: (p: string) => Promise<void>;
+  changeTemperature: (t: number) => Promise<void>;
   chat: (p: string) => Promise<string>;
   clearHistory: () => Promise<void>;
   clipboardCopy: (c: string) => Promise<void>;
