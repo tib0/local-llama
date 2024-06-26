@@ -40,20 +40,6 @@ const ChatForm = () => {
     setError({});
   }
 
-  useEffect(() => {
-    if (!loading) inputRef.current?.focus();
-    window.electronAPI.onModelChange((modelPath) => {
-      if (!modelPath) {
-        return;
-      }
-      setModel(modelPath);
-      setCurrentModel(modelPath);
-      dispatch({
-        type: "CLEAR_HISTORY",
-      });
-    });
-  }, [loading]);
-
   async function sendPrompt() {
     if (
       loading ||
@@ -95,10 +81,6 @@ const ChatForm = () => {
     setLoading(false);
   }
 
-  useEffect(() => {
-    setHistory(chatHistory);
-  }, [chatHistory]);
-
   const handleSelectGpuChange = (e: ChangeEvent<HTMLSelectElement>) => {
     switch (e.target?.value) {
       case "auto":
@@ -123,6 +105,30 @@ const ChatForm = () => {
         break;
     }
   };
+
+  async function handleSaveHistory() {
+    console.debug("Componenet Saving history...");
+    const res = await window.electronAPI.saveHistory();
+    console.debug(res);
+  }
+
+  useEffect(() => {
+    setHistory(chatHistory);
+  }, [chatHistory]);
+
+  useEffect(() => {
+    if (!loading) inputRef.current?.focus();
+    window.electronAPI.onModelChange((modelPath) => {
+      if (!modelPath) {
+        return;
+      }
+      setModel(modelPath);
+      setCurrentModel(modelPath);
+      dispatch({
+        type: "CLEAR_HISTORY",
+      });
+    });
+  }, [loading]);
 
   return (
     <form
@@ -206,7 +212,7 @@ const ChatForm = () => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              //todo save conversation
+              handleSaveHistory();
             }}
           >
             Save

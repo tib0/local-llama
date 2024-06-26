@@ -12,4 +12,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getModelInfo: () => ipcRenderer.invoke("model-info"),
   loadModel: (model) => ipcRenderer.invoke("model-load", model),
   onModelChange: (callback) => ipcRenderer.on("model-changed", (_, arg) => callback(arg)),
+  saveHistory: () => ipcRenderer.invoke("model-save-history"),
 });

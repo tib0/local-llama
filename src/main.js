@@ -11,6 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const cache = path.join(os.homedir(), ".cache/local-llama");
 const modelsFolder = path.join(cache, "models");
+const historyFolder = path.join(cache, "history");
 const logsFolder = path.join(cache, "logs");
 
 const store = new Store();
@@ -34,6 +35,13 @@ if (!logDir || !fs.existsSync(logsFolder)) {
   const defaultLogDir = logsFolder;
   fs.mkdirSync(defaultLogDir, { recursive: true });
   store.set("log_dir", defaultLogDir);
+}
+
+const historyDir = store.get("history_dir");
+if (!historyDir || !fs.existsSync(historyFolder)) {
+  const defaultHistoryDir = historyFolder;
+  fs.mkdirSync(defaultHistoryDir, { recursive: true });
+  store.set("history_dir", defaultHistoryDir);
 }
 
 const promptSystem = `You are an assistant to a human being.`;
@@ -137,6 +145,8 @@ ipcMain.handle("model-chat", chat);
 
 ipcMain.handle("model-info", getModelInfo);
 
+ipcMain.handle("model-save-history", saveHistory);
+
 ipcMain.on("model-change", changeModel);
 
 ipcMain.on("model-change-gpu-use", changeModelGpuUse);
@@ -211,6 +221,39 @@ async function loadModel(_event, modelPath) {
     store.set("gpu", "auto");
     return "";
   }
+}
+
+async function saveHistory(_event) {
+  const result = await dialog.showSaveDialog({
+    title: "Save file as",
+    defaultPath: store.get("history_dir"),
+    filters: [
+      {
+        name: "Conversation history",
+        extensions: ["lllh"],
+      },
+    ],
+  });
+
+  try {
+    if (!result || result.canceled) return "";
+    const history = await llamaNodeCPP.getHistory();
+    const conversation = {
+      history: {
+        ...history,
+      },
+      model_path: store.get("selected_model"),
+      prompt_system: store.get("prompt_system"),
+      gpu: store.get("gpu"),
+      temperature: store.get("temperature"),
+    };
+    fs.writeFileSync(result.filePath, JSON.stringify(conversation), "utf-8");
+  } catch (e) {
+    console.log(e, result);
+    return "";
+  }
+
+  return result.filePath;
 }
 
 async function changeModelGpuUse(_event, gpuUse) {
