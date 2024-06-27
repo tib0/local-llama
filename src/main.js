@@ -226,9 +226,11 @@ async function loadModel(_event, modelPath) {
 }
 
 async function saveHistory(_event) {
+  const date = new Date();
+  const defaultFileName = `${date.toISOString().replaceAll(":", "-")}.lllh`;
   const result = await dialog.showSaveDialog({
     title: "Save file as",
-    defaultPath: store.get("history_dir"),
+    defaultPath: path.join(store.get("history_dir"), defaultFileName),
     filters: [
       {
         name: "Conversation history",
