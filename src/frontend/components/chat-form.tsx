@@ -57,11 +57,16 @@ const ChatForm = () => {
     init();
     setLoading(true);
 
+    const start = Date.now();
     await window.electronAPI.chat(prompt).then((response: string) => {
       if (response) {
+        const end = Date.now();
+        const elapsed = new Date(end - start).toISOString().substr(11, 8);
         dispatch({
           type: "PROMPT_CHAT",
-          payload: [{ type: "model", response: [response] }] as ChatHistoryItem[],
+          payload: [
+            { type: "model", response: [response + "\n\n" + elapsed] },
+          ] as ChatHistoryItem[],
         });
       }
     });
@@ -107,9 +112,21 @@ const ChatForm = () => {
   };
 
   async function handleSaveHistory() {
-    console.debug("Componenet Saving history...");
     const res = await window.electronAPI.saveHistory();
-    console.debug(res);
+    if (res === "") console.log("Save history failed");
+  }
+
+  async function handleLoadHistory() {
+    const res = await window.electronAPI.loadHistory();
+    if (!res || res === "") {
+      console.log("Load history failed");
+      return;
+    }
+    const histArray = Object.keys(res).map((key) => res[key]);
+    dispatch({
+      type: "LOAD_CHAT",
+      payload: histArray,
+    });
   }
 
   useEffect(() => {
@@ -188,7 +205,7 @@ const ChatForm = () => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              //todo load one of stored conversation
+              handleLoadHistory();
             }}
           >
             History...
@@ -306,11 +323,13 @@ const ChatForm = () => {
               );
             case "system":
               return (
-                <ChatBubbleSystem
+                <>
+                  {/* <ChatBubbleSystem
                   key={index.toString()}
                   index={index.toString()}
                   text={c.text as string}
-                />
+                /> */}
+                </>
               );
             default:
               return (

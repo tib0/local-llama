@@ -8,7 +8,7 @@ import images from "../lib/images";
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
   const [systemPrompt, setSystemPrompt] = useState<string>("");
-  const [temperature, setTemperature] = useState<number>(null);
+  const [temperature, setTemperature] = useState<number>(0);
   const [expandedView, setExpandedView] = useState<boolean>(false);
   const [tempIco, setTempIco] = useState<any>(null);
 
@@ -28,7 +28,7 @@ function ModelInfos({ model }: { model: string }) {
   useEffect(() => {
     interval.current = setInterval(async () => {
       await getModelInfo();
-    }, 800);
+    }, 500);
     return () => {
       debouncedRangeChangeHandler.cancel();
       clearInterval(interval.current);
@@ -36,7 +36,7 @@ function ModelInfos({ model }: { model: string }) {
   }, []);
 
   useEffect(() => {
-    if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50);
+    if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
 
     if (temperature) {
       switch (true) {
@@ -64,6 +64,34 @@ function ModelInfos({ model }: { model: string }) {
       }
     }
   }, [modelInfo?.llama?.temperature, temperature]);
+
+  useEffect(() => {
+    setTemperature(modelInfo?.llama?.temperature * 50);
+    const temp = modelInfo?.llama?.temperature * 50;
+    switch (true) {
+      case temp === 0:
+        setTempIco(images.fire);
+        break;
+      case temp > 80:
+        setTempIco(images.red);
+        break;
+      case temp > 50 && temp < 81:
+        setTempIco(images.pink);
+        break;
+      case temp > 35 && temp < 51:
+        setTempIco(images.green);
+        break;
+      case temp > 15 && temp < 36:
+        setTempIco(images.gray);
+        break;
+      case temp > 0 && temp < 16:
+        setTempIco(images.blue);
+        break;
+      default:
+        setTempIco(images.fire);
+        break;
+    }
+  }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
   const getStatusColor = (label: string) => {
     switch (label) {
@@ -341,7 +369,7 @@ function ModelInfos({ model }: { model: string }) {
           </div>
         </div>
       </div>
-      {modelInfo && modelInfo.llama && typeof modelInfo.llama.temperature === "number" && (
+      {modelInfo && modelInfo.llama && typeof modelInfo.llama.temperature === "number" ? (
         <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
           <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
             <img
@@ -362,6 +390,15 @@ function ModelInfos({ model }: { model: string }) {
                 debouncedRangeChangeHandler(e);
               }}
             />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
+          <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
+            <div className="skeleton w-7 h-8 bg-white/90 mb-1 rounded-full border-[3px] border-primary" />
+          </div>
+          <div className="flex-grow-1 w-full text-center flex items-center justify-center">
+            <div className="skeleton h-8 w-full" />
           </div>
         </div>
       )}

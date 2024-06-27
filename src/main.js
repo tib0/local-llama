@@ -147,6 +147,8 @@ ipcMain.handle("model-info", getModelInfo);
 
 ipcMain.handle("model-save-history", saveHistory);
 
+ipcMain.handle("model-load-history", loadHistory);
+
 ipcMain.on("model-change", changeModel);
 
 ipcMain.on("model-change-gpu-use", changeModelGpuUse);
@@ -256,6 +258,49 @@ async function saveHistory(_event) {
   return result.filePath;
 }
 
+async function loadHistory(_event) {
+  let historyParm;
+  const result = await dialog.showOpenDialog({
+    filters: [
+      {
+        name: "Conversation history",
+        extensions: ["lllh"],
+      },
+    ],
+    title: "Load history from",
+    defaultPath: store.get("history_dir"),
+    properties: ["openFile"],
+  });
+  if (!result || result.canceled) return;
+  try {
+    historyParm = JSON.parse(fs.readFileSync(result.filePaths[0], "utf-8"));
+  } catch (e) {
+    console.log(e);
+    return;
+  }
+
+  try {
+    store.set("selected_model", historyParm.model_path);
+    store.set("prompt_system", historyParm.prompt_system);
+    store.set("gpu", historyParm.gpu);
+    store.set("temperature", historyParm.temperature);
+
+    llamaNodeCPP.temperature = store.get("temperature");
+
+    llamaNodeCPP.clearHistory();
+    await llamaNodeCPP.disposeSession();
+    await llamaNodeCPP.disposeModel();
+    await llamaNodeCPP.disposeLlama();
+
+    await loadModel();
+    await llamaNodeCPP.setHistory(historyParm.history);
+    return historyParm.history;
+  } catch (e) {
+    console.log(e, result);
+    return;
+  }
+}
+
 async function changeModelGpuUse(_event, gpuUse) {
   store.set("gpu", gpuUse);
   llamaNodeCPP.clearHistory();
@@ -303,6 +348,7 @@ async function chat(_event, userMessage) {
 async function changeModel() {
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: ["gguf"] }],
+    defaultPath: store.get("model_dir"),
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {

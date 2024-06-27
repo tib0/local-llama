@@ -24,4 +24,5 @@ export interface IElectronAPI {
   loadModel: (m?: string) => Promise<string>;
   onModelChange: (h: (modelPath?: string | undefined) => void) => Promise<void>;
   saveHistory: () => Promise<string>;
+  loadHistory: () => Promise<any>;
 }
