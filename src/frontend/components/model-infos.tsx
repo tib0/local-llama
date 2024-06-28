@@ -4,6 +4,7 @@ import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
 import { MicIcon } from "../lib/icons";
 import { ChatContext } from "../providers/chat";
 import images from "../lib/images";
+import { titleCase } from "../lib/text";
 
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
@@ -359,7 +360,11 @@ function ModelInfos({ model }: { model: string }) {
           <div className="flex flex-col sm:flex-row justify-between pt-4 text-base-content/30">
             {modelInfo && modelInfo.llama && (
               <span className="text-sm font-bold italic">
-                {modelInfo.llama.deviceNames + " - " + modelInfo.llama.gpu}
+                {modelInfo.llama.deviceNames && modelInfo.llama.gpu
+                  ? modelInfo.llama.deviceNames + " - " + titleCase(modelInfo.llama.gpu)
+                  : modelInfo.llama.gpu === false
+                    ? "No GPU"
+                    : ""}
               </span>
             )}
 
