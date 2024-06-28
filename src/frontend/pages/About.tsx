@@ -26,6 +26,21 @@ function About(): JSX.Element {
                   Hugginface.co
                 </a>
               </p>
+              <div className="flex flex-col justify-center items-center">
+                <ul className="text-left list-decimal list-inside mx-4 py-2 max-w-lg">
+                  <li>Choose the model you want to run by clicking the "Model... button.</li>
+                  <li>
+                    Adjust the GPU setting for optimal performance using Vulkan, CUDA, Metal,
+                    or no GPU at all.
+                  </li>
+                  <li>
+                    Regulate the temperature slider to define your desired level (maximum is 2,
+                    minimum is 0).
+                  </li>
+                  <li>Begin conversing!</li>
+                  <li>You can save chat history to track previous discussions.</li>
+                </ul>
+              </div>
             </div>
             <div className="flex flex-col justify-center items-center">
               <p>

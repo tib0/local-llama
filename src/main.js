@@ -240,7 +240,7 @@ async function saveHistory(_event) {
   });
 
   if (!result || result.canceled) return "";
-  
+
   try {
     const history = await llamaNodeCPP.getHistory();
     const conversation = {
