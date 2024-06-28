@@ -239,13 +239,12 @@ async function saveHistory(_event) {
     ],
   });
 
+  if (!result || result.canceled) return "";
+  
   try {
-    if (!result || result.canceled) return "";
     const history = await llamaNodeCPP.getHistory();
     const conversation = {
-      history: {
-        ...history,
-      },
+      history: history,
       model_path: store.get("selected_model"),
       prompt_system: store.get("prompt_system"),
       gpu: store.get("gpu"),
@@ -269,7 +268,7 @@ async function loadHistory(_event) {
         extensions: ["lllh"],
       },
     ],
-    title: "Load history from",
+    title: "Load history from...",
     defaultPath: store.get("history_dir"),
     properties: ["openFile"],
   });
