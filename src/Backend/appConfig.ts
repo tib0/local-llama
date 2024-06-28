@@ -16,6 +16,12 @@ export function appMenu(store) {
           },
         },
         {
+          label: "Open history folder",
+          click: async () => {
+            await shell.openPath(store.get("history_dir"));
+          },
+        },
+        {
           label: "Open logs folder",
           click: async () => {
             await shell.openPath(store.get("log_dir"));
