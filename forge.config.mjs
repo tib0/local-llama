@@ -2,7 +2,6 @@ export default {
   buildIdentifier: "esm",
   defaultResolved: true,
   packagerConfig: {
-    asar: true,
     compression: "store",
     appCategoryType: "public.app-category.utilities",
     icon: "./static/icon",

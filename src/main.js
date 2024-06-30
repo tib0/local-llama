@@ -27,21 +27,21 @@ const modelDir = store.get("model_dir");
 if (!modelDir || !fs.existsSync(modelsFolder)) {
   const defaultModelDir = modelsFolder;
   fs.mkdirSync(defaultModelDir, { recursive: true });
-  store.set("model_dir", defaultModelDir);
+  store.set("model_dir", defaultModelDir ?? "");
 }
 
 const logDir = store.get("log_dir");
 if (!logDir || !fs.existsSync(logsFolder)) {
   const defaultLogDir = logsFolder;
   fs.mkdirSync(defaultLogDir, { recursive: true });
-  store.set("log_dir", defaultLogDir);
+  store.set("log_dir", defaultLogDir ?? "");
 }
 
 const historyDir = store.get("history_dir");
 if (!historyDir || !fs.existsSync(historyFolder)) {
   const defaultHistoryDir = historyFolder;
   fs.mkdirSync(defaultHistoryDir, { recursive: true });
-  store.set("history_dir", defaultHistoryDir);
+  store.set("history_dir", defaultHistoryDir ?? "");
 }
 
 const promptSystem = `You are an assistant to a human being.`;
@@ -56,9 +56,9 @@ const availableModels = fs
 
 if (!store.get("selected_model") || !fs.existsSync(store.get("selected_model"))) {
   if (availableModels.length === 0 || !fs.existsSync(availableModels[0])) {
-    store.set("selected_model", undefined);
+    store.set("selected_model", "");
   }
-  store.set("selected_model", availableModels[0]);
+  store.set("selected_model", availableModels[0] ?? "");
 }
 
 if (!store.get("gpu")) {
@@ -206,7 +206,7 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.disposeLlama();
     await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
   }
-
+  console.log("selectedModelPath", selectedModelPath);
   await llamaNodeCPP.loadModel(selectedModelPath);
   await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
 
@@ -214,12 +214,12 @@ async function loadModel(_event, modelPath) {
     window.webContents.send("model-changed", selectedModelPath);
   }
 
-  store.set("selected_model", selectedModelPath);
+  store.set("selected_model", selectedModelPath ?? "");
 
   if (llamaNodeCPP.isReady()) {
     return selectedModelPath;
   } else {
-    store.set("selected_model", selectedModelPath);
+    store.set("selected_model", selectedModelPath ?? "");
     store.set("gpu", "auto");
     return "";
   }
@@ -281,10 +281,10 @@ async function loadHistory(_event) {
   }
 
   try {
-    store.set("selected_model", historyParm.model_path);
-    store.set("prompt_system", historyParm.prompt_system);
-    store.set("gpu", historyParm.gpu);
-    store.set("temperature", historyParm.temperature);
+    store.set("selected_model", historyParm.model_path ?? "");
+    store.set("prompt_system", historyParm.prompt_system ?? "");
+    store.set("gpu", historyParm.gpu ?? "");
+    store.set("temperature", historyParm.temperature ?? "");
 
     llamaNodeCPP.temperature = store.get("temperature");
 
