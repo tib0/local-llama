@@ -12,6 +12,8 @@ function ModelInfos({ model }: { model: string }) {
   const [temperature, setTemperature] = useState<number>(0);
   const [expandedView, setExpandedView] = useState<boolean>(false);
   const [tempIco, setTempIco] = useState<any>(null);
+  const interval = useRef(null);
+  const { dispatch } = useContext(ChatContext);
 
   const modelName =
     model.split("/").length > 0
@@ -23,76 +25,30 @@ function ModelInfos({ model }: { model: string }) {
     setModelInfo(JSON.parse(mi) as LlamaCppInfo);
   }
 
-  const interval = useRef(null);
-  const { dispatch } = useContext(ChatContext);
-
-  useEffect(() => {
-    interval.current = setInterval(async () => {
-      await getModelInfo();
-    }, 500);
-    return () => {
-      debouncedRangeChangeHandler.cancel();
-      clearInterval(interval.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
-
-    if (temperature) {
+  const defineTempIco = (temp: number) => {
+    if (temp) {
       switch (true) {
-        case temperature === 0:
-          setTempIco(images.fire);
-          break;
-        case temperature > 80:
-          setTempIco(images.red);
-          break;
-        case temperature > 50 && temperature < 81:
-          setTempIco(images.pink);
-          break;
-        case temperature > 35 && temperature < 51:
-          setTempIco(images.green);
-          break;
-        case temperature > 15 && temperature < 36:
-          setTempIco(images.gray);
-          break;
-        case temperature > 0 && temperature < 16:
+        case temp === 0:
           setTempIco(images.blue);
           break;
-        default:
-          setTempIco(images.fire);
+        case temp > 80:
+          setTempIco(images.red);
+          break;
+        case temp > 50:
+          setTempIco(images.yellow);
+          break;
+        case temp > 35:
+          setTempIco(images.green);
+          break;
+        case temp > 15:
+          setTempIco(images.blue);
+          break;
+        case temp > 0:
+          setTempIco(images.blue);
           break;
       }
     }
-  }, [modelInfo?.llama?.temperature, temperature]);
-
-  useEffect(() => {
-    setTemperature(modelInfo?.llama?.temperature * 50);
-    const temp = modelInfo?.llama?.temperature * 50;
-    switch (true) {
-      case temp === 0:
-        setTempIco(images.fire);
-        break;
-      case temp > 80:
-        setTempIco(images.red);
-        break;
-      case temp > 50 && temp < 81:
-        setTempIco(images.pink);
-        break;
-      case temp > 35 && temp < 51:
-        setTempIco(images.green);
-        break;
-      case temp > 15 && temp < 36:
-        setTempIco(images.gray);
-        break;
-      case temp > 0 && temp < 16:
-        setTempIco(images.blue);
-        break;
-      default:
-        setTempIco(images.fire);
-        break;
-    }
-  }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
+  };
 
   const getStatusColor = (label: string) => {
     switch (label) {
@@ -129,6 +85,26 @@ function ModelInfos({ model }: { model: string }) {
   };
 
   const debouncedRangeChangeHandler = useMemo(() => debounce(sendTemperature, 600), []);
+
+  useEffect(() => {
+    interval.current = setInterval(async () => {
+      await getModelInfo();
+    }, 777);
+    return () => {
+      debouncedRangeChangeHandler.cancel();
+      clearInterval(interval.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
+    defineTempIco(temperature);
+  }, [modelInfo?.llama?.temperature, temperature]);
+
+  useEffect(() => {
+    setTemperature(modelInfo?.llama?.temperature * 50);
+    defineTempIco(modelInfo?.llama?.temperature * 50);
+  }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
   return (
     <div className="flex flex-col w-full">
@@ -192,8 +168,8 @@ function ModelInfos({ model }: { model: string }) {
                       </span>
                       <span
                         className={`
-                        text-base font-light text-base-content/70
-                      `}
+                      text-base font-light text-base-content/70
+                    `}
                       >
                         {" " + modelInfo.llama.temperature}
                       </span>
@@ -376,11 +352,15 @@ function ModelInfos({ model }: { model: string }) {
       </div>
       {modelInfo && modelInfo.llama && typeof modelInfo.llama.temperature === "number" ? (
         <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
-          <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
-            <img
-              className="w-7 h-8 bg-white/90 mb-1 rounded-full border-[3px] border-primary"
-              src={tempIco}
-            />
+          <div
+            className="tooltip"
+            data-tip={(temperature ? temperature / 50 : 0).toLocaleString()}
+          >
+            <div className="w-16 flex flex-grow-0 items-center justify-center">
+              <div className="bg-base-100/90 w-8 h-10 border-primary border-[3px] rounded-t-full rounded-b-md overflow-hidden">
+                <img className="mt-[-4px]" src={tempIco} />
+              </div>
+            </div>
           </div>
           <div className="flex-grow-1 w-full">
             <input
