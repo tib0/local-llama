@@ -37,7 +37,6 @@
     "package:win-x64": "cross-env NODE_ENV=production electron-forge package --platform=win32 --arch=x64",
     "package:linux-x64": "cross-env NODE_ENV=production electron-forge package --platform=linux --arch=x64",
     "package:linux-arm": "cross-env NODE_ENV=production electron-forge package --platform=linux --arch=arm64",
-    "make:all": "npm run format && npm run lint && npm run typecheck && npm run make:mac-x64 && npm run make:mac-arm && npm run make:win-x64 && npm run make:linux-x64 && npm run make:linux-arm",
     "make:mac-x64": "cross-env NODE_ENV=production electron-forge make --platform=darwin --arch=x64",
     "make:mac-arm": "cross-env NODE_ENV=production electron-forge make --platform=darwin --arch=arm64",
     "make:win-x64": "cross-env NODE_ENV=production electron-forge make --platform=win32 --arch=x64",
