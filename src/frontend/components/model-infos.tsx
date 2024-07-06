@@ -112,6 +112,7 @@ function ModelInfos({ model }: { model: string }) {
         <input
           type="checkbox"
           className="peer"
+          tabIndex={-1}
           checked={expandedView}
           readOnly
           onClick={() => setExpandedView(!expandedView)}
@@ -177,7 +178,7 @@ function ModelInfos({ model }: { model: string }) {
                   </div>
                 )}
               <div className="collapse mt-4 bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-md rounded-xl">
-                <input type="checkbox" />
+                <input type="checkbox" tabIndex={-1} />
                 <div className="collapse-title text-xl font-extrabold">
                   Set system prompt...
                 </div>
@@ -200,23 +201,23 @@ function ModelInfos({ model }: { model: string }) {
                   <div className="flex flex-col justify-center">
                     <label
                       className={`
-                      sticky z-10 top-[4.2rem] bg-base-100 h-20 my-2
-                      border-primary/30 bordered border-2 
-                      shadow-xl rounded-xl flex items-center 
-                      transition-all justify-between
-                    `}
+                        sticky z-10 top-[4.2rem] bg-base-100 h-20 my-2
+                        border-primary/30 bordered border-2 
+                        shadow-xl rounded-xl flex items-center 
+                        transition-all justify-between
+                      `}
                     >
                       <textarea
                         id="system-prompt-input"
                         autoComplete="on"
                         spellCheck={true}
-                        tabIndex={0}
+                        tabIndex={-1}
                         className={`
-                        w-full bg-transparent 
-                        textarea py-2 h-full textarea-ghost
-                        focus:border-none focus:outline-none text-base leading-7
-                        resize-none disabled:bg-transparent disabled:border-none
-                      `}
+                          w-full bg-transparent 
+                          textarea py-2 h-full textarea-ghost
+                          focus:border-none focus:outline-none text-base leading-7
+                          resize-none disabled:bg-transparent disabled:border-none
+                        `}
                         rows={2}
                         placeholder={`Start typing here, and press enter or click on the button`}
                         onChange={(e) => setSystemPrompt(e.target.value)}
