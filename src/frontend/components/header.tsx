@@ -99,11 +99,18 @@ const Header = () => {
               {menuLink("MOBILE")}
             </ul>
           </div>
-          <Link className={`font-black text-2xl text-primary p-3 not-drag-window`} key="homeChatLink" to="/">
+          <Link
+            className={`font-black text-2xl text-primary p-3 not-drag-window`}
+            key="homeChatLink"
+            to="/"
+          >
             L³
           </Link>
           {/* MOBILE */}
-          <label className="swap swap-rotate md:hidden p-2 not-drag-window" aria-label="Swap-theme">
+          <label
+            className="swap swap-rotate md:hidden p-2 not-drag-window"
+            aria-label="Swap-theme"
+          >
             {themeSwap}
           </label>
         </div>

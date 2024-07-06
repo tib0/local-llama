@@ -93,7 +93,7 @@ const createWindow = () => {
     },
     show: false,
     frame: false,
-    transparent: true,
+    hasShadow: true,
   });
 
   mainWindow.setBounds(winBounds(store));

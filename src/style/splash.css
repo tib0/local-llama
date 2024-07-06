@@ -1,24 +1,13 @@
-body {
-  background-color: rgb(241, 242, 220);
-  font-family: "Lexend Deca", sans-serif;
-  color: #0f0f0f;
-}
-
 .container {
   display: flex;
   flex-direction: column;
   justify-content: end;
   align-items: center;
   height: 100%;
+  width: 200px;
 }
 
 .excited-llama {
-  width: 200px;
-}
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #343446;
-    font-family: "Lexend Deca", sans-serif;
-    color: #efefef;
-  }
+  height: 100%;
+  width: 100%;
 }

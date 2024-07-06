@@ -14,7 +14,7 @@ const config = {
           error: "#FF0000",
           success: "#49E949",
           warning: "#F9FF50",
-          "body": {
+          body: {
             "border-radius": "11px",
           },
           "#root": {
@@ -30,7 +30,7 @@ const config = {
             "background-blend-mode": "multiply",
             "min-height": "100vh",
             padding: "4rem 0.5rem 0.5rem 0.5rem",
-            "border-bottom-width": "1px",
+            "border-bottom-width": "2px",
             "--tw-border-opacity": "1",
             "border-bottom-color":
               "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))",
@@ -39,7 +39,7 @@ const config = {
         dracula: {
           ...require("daisyui/src/theming/themes")["dracula"],
           primary: "#3caba2",
-          "body": {
+          body: {
             "border-radius": "11px",
           },
           "#root": {
@@ -55,7 +55,7 @@ const config = {
             "background-blend-mode": "multiply",
             "min-height": "100vh",
             padding: "4rem 0.5rem 0.5rem 0.5rem",
-            "border-bottom-width": "1px",
+            "border-bottom-width": "2px",
             "--tw-border-opacity": "1",
             "border-bottom-color":
               "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))",
