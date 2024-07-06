@@ -92,6 +92,8 @@ const createWindow = () => {
       preload: path.join(__dirname, "preload.js"),
     },
     show: false,
+    frame: false,
+    transparent: true,
   });
 
   mainWindow.setBounds(winBounds(store));

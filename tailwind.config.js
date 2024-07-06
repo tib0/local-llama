@@ -14,6 +14,12 @@ const config = {
           error: "#FF0000",
           success: "#49E949",
           warning: "#F9FF50",
+          "body": {
+            "border-radius": "11px",
+          },
+          "#root": {
+            "border-radius": "11px",
+          },
           "#main": {
             "--gradient-light":
               "linear-gradient(187deg, rgba(248,253,239,1) 2%, rgba(203,110,118,0.05) 24%, rgba(203,110,118,0.05) 83%, rgba(248,253,239,1) 95%)",
@@ -23,16 +29,22 @@ const config = {
             "background-size": "cover ",
             "background-blend-mode": "multiply",
             "min-height": "100vh",
-            "border-bottom-width": "2px",
+            padding: "4rem 0.5rem 0.5rem 0.5rem",
+            "border-bottom-width": "1px",
             "--tw-border-opacity": "1",
             "border-bottom-color":
               "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))",
-            padding: "4rem 0.5rem 0.5rem 0.5rem",
           },
         },
         dracula: {
           ...require("daisyui/src/theming/themes")["dracula"],
           primary: "#3caba2",
+          "body": {
+            "border-radius": "11px",
+          },
+          "#root": {
+            "border-radius": "11px",
+          },
           "#main": {
             "--gradient-dark":
               "linear-gradient(185deg, rgba(40,42,54,0.90) 2%, rgba(59,168,159,0) 24%, rgba(60,171,162,0.0) 80%, rgba(40,42,54,0.95) 95%)",
@@ -42,11 +54,11 @@ const config = {
             "background-size": "cover ",
             "background-blend-mode": "multiply",
             "min-height": "100vh",
-            "border-bottom-width": "2px",
+            padding: "4rem 0.5rem 0.5rem 0.5rem",
+            "border-bottom-width": "1px",
             "--tw-border-opacity": "1",
             "border-bottom-color":
               "var(--fallback-p,oklch(var(--p)/var(--tw-border-opacity)))",
-            padding: "4rem 0.5rem 0.5rem 0.5rem",
           },
         },
       },

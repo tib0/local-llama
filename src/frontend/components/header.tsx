@@ -62,14 +62,14 @@ const Header = () => {
 
   return (
     <>
-      <div className="font-customNavbar navbar p-4 bg-base-100 text-base-content fixed top-0 z-30 flex h-9 md:justify-center bg-opacity-30 backdrop-blur-lg transition-shadow shadow-lg">
+      <div className="drag-window font-customNavbar navbar p-4 bg-base-100 text-base-content fixed top-0 z-30 flex h-9 md:justify-center bg-opacity-30 backdrop-blur-lg transition-shadow shadow-lg">
         <div className="navbar-start">
           <div className="dropdown shadow-2xl rounded-lg">
             <div
               tabIndex={0}
               onClick={() => setSmMenuVisibile(true)}
               role="button"
-              className="btn btn-sm btn-ghost md:hidden"
+              className="btn btn-sm btn-ghost md:hidden not-drag-window"
               aria-label="Menu"
               title="Menu"
             >
@@ -94,26 +94,26 @@ const Header = () => {
               key="mobileMenu"
               onClick={() => setSmMenuVisibile(!smMenuVisibile)}
               tabIndex={0}
-              className={`${!smMenuVisibile && "hidden"} menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box transition-shadow w-64`}
+              className={`${!smMenuVisibile && "hidden"} menu menu-sm dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box transition-shadow w-64 not-drag-windo`}
             >
               {menuLink("MOBILE")}
             </ul>
           </div>
-          <Link className={`font-black text-2xl text-primary p-3`} key="homeBlogLink" to="/">
+          <Link className={`font-black text-2xl text-primary p-3 not-drag-window`} key="homeChatLink" to="/">
             L³
           </Link>
           {/* MOBILE */}
-          <label className="swap swap-rotate md:hidden p-2" aria-label="Swap-theme">
+          <label className="swap swap-rotate md:hidden p-2 not-drag-window" aria-label="Swap-theme">
             {themeSwap}
           </label>
         </div>
         <div className="navbar-center hidden md:flex">
           {/* DESKTOP */}
-          <ul id="desktopMenu" className="menu-horizontal px-1">
+          <ul id="desktopMenu" className="menu-horizontal px-1 not-drag-window">
             {menuLink("DESKTOP")}
           </ul>
         </div>
-        <div className="navbar-end hidden md:flex pr-1">
+        <div className="navbar-end hidden md:flex pr-1 not-drag-window">
           {/* DESKTOP */}
           <label aria-label="Swap theme" className="swap swap-rotate px-2">
             {themeSwap}
