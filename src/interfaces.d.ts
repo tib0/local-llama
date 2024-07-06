@@ -21,8 +21,9 @@ export interface IElectronAPI {
   clearHistory: () => Promise<void>;
   clipboardCopy: (c: string) => Promise<void>;
   getModelInfo: () => Promise<string>;
+  loadHistory: () => Promise<any>;
   loadModel: (m?: string) => Promise<string>;
   onModelChange: (h: (modelPath?: string | undefined) => void) => Promise<void>;
+  openExternalLink: (h) => Promise<void>;
   saveHistory: () => Promise<string>;
-  loadHistory: () => Promise<any>;
 }

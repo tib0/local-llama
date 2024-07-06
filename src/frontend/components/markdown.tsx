@@ -45,6 +45,23 @@ const MarkdownRenderer = ({ children: markdown }: MarkdownRendererProps) => {
             </code>
           );
         },
+        a({ ...props }: any) {
+          return (
+            <a
+              className="link link-primary font-semibold"
+              aria-label="Open link in default browser"
+              tabIndex={0}
+              href={undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.electronAPI.openExternalLink(props.href);
+              }}
+            >
+              {props.children}
+            </a>
+          );
+        },
       }}
     >
       {markdown}

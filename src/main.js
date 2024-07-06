@@ -1,4 +1,14 @@
-import { Menu, BrowserWindow, app, ipcMain, net, protocol, dialog, clipboard } from "electron";
+import {
+  Menu,
+  BrowserWindow,
+  app,
+  ipcMain,
+  net,
+  protocol,
+  dialog,
+  clipboard,
+  shell,
+} from "electron";
 import Store from "electron-store";
 import fs from "fs";
 import os from "os";
@@ -159,6 +169,8 @@ ipcMain.on("model-change-temperature", changeTemperature);
 
 ipcMain.on("model-clear-history", clearHistory);
 
+ipcMain.on("open-external-link", openExternalLink);
+
 ipcMain.on("clipboard-copy", clipboardCopy);
 
 app.on("window-all-closed", () => {
@@ -176,6 +188,10 @@ app.on("activate", () => {
 
 async function clipboardCopy(_event, content) {
   clipboard.writeText(content, "clipboard");
+}
+
+async function openExternalLink(_event, href) {
+  shell.openExternal(href);
 }
 
 async function loadModel(_event, modelPath) {
@@ -206,7 +222,6 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.disposeLlama();
     await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
   }
-  console.log("selectedModelPath", selectedModelPath);
   await llamaNodeCPP.loadModel(selectedModelPath);
   await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
 

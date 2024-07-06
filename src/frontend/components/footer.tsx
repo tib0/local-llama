@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { LinkedInIcon, GithubIcon, SoundcloudIcon } from "../lib/icons";
 
 const Footer = () => {
@@ -30,33 +29,47 @@ const Footer = () => {
         <nav>
           <header className="footer-title opacity-100">Social</header>
           <div className="grid grid-flow-col gap-4">
-            <Link
-              className={`
-              `}
+            <a
+              className={`link`}
               aria-label="Linkedin-Tib0"
               target="blank"
-              to="https://www.linkedin.com/in/thibault-martin-1b934083/"
+              href={undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.electronAPI.openExternalLink(
+                  "https://www.linkedin.com/in/thibault-martin-1b934083/",
+                );
+              }}
             >
               <LinkedInIcon />
-            </Link>
-            <Link
-              className={`
-              `}
+            </a>
+            <a
+              className={`link`}
               aria-label="Github-Tib0"
               target="blank"
-              to="https://github.com/tib0"
+              href={undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.electronAPI.openExternalLink("https://github.com/tib0");
+              }}
             >
               <GithubIcon />
-            </Link>
-            <Link
-              className={`
-              `}
+            </a>
+            <a
+              className={`link`}
               aria-label="Soundcloud-Tib0"
               target="blank"
-              to="https://soundcloud.com/rockinpef"
+              href={undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.electronAPI.openExternalLink("https://soundcloud.com/rockinpef");
+              }}
             >
               <SoundcloudIcon />
-            </Link>
+            </a>
           </div>
         </nav>
       </footer>
