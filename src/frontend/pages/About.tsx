@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import React from "react";
-import HomeLayout from "../layout/home";
+import AboutLayout from "../layout/about";
 import images from "../lib/images";
 
 function About(): JSX.Element {
   return (
-    <HomeLayout>
+    <AboutLayout>
       <React.Fragment>
         <div className={`min-h-[calc(100vh-5rem)] text-center`}>
           <div className="flex justify-center">
@@ -93,7 +93,7 @@ function About(): JSX.Element {
           </div>
         </div>
       </React.Fragment>
-    </HomeLayout>
+    </AboutLayout>
   );
 }
 
