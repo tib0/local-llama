@@ -42,6 +42,21 @@ const Header = () => {
           About
         </Link>
       </li>
+      <li key={"aboutLink" + src}>
+        <a
+          key="aboutLink"
+          className={`
+            mx-2 font-light text-lg hover:cursor-pointer
+          `}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.electronAPI.quitApp();
+          }}
+        >
+          Quit
+        </a>
+      </li>
     </>
   );
 

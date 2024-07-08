@@ -195,8 +195,8 @@ export class LlamaWrapper {
    */
   private setStatus(status: LlamaStatusType, payload?: string) {
     console.log(
-      "\x1b[93m\x1b[103mLlamaWrapper\x1b[0m" + status.ico + "\x1b[1m(" + status.text + ")",
-      payload && payload != "undefined" ? "\x1b[0m" + payload + "\x1b[0m" : "",
+      "\x1b[0m\x1b[1mLlamaWrapper\x1b[0m" + status.ico + "\x1b[0m(" + status.text + ")\x1b[0m",
+      payload && payload != "undefined" ? "" + payload + "\x1b[0m" : "",
     );
     this.status = { status, message: payload };
   }

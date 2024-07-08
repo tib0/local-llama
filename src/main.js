@@ -177,6 +177,8 @@ ipcMain.handle("model-save-history", saveHistory);
 
 ipcMain.handle("model-load-history", loadHistory);
 
+ipcMain.handle("quit-app", quitApp);
+
 ipcMain.on("model-change", changeModel);
 
 ipcMain.on("model-change-gpu-use", changeModelGpuUse);
@@ -355,6 +357,10 @@ async function changeModelSystemPrompt(_event, promptSystem) {
 
 async function changeTemperature(_event, temperature) {
   store.set("temperature", temperature);
+}
+
+async function quitApp(_event) {
+  app.quit();
 }
 
 async function clearHistory() {
