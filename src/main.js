@@ -118,6 +118,7 @@ const createWindow = () => {
     backgroundColor: "#00000000",
     vibrancy: "popover",
     visualEffectState: "followWindow",
+    backgroundMaterial: "acrylic",
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
