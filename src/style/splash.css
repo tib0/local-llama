@@ -5,9 +5,16 @@
   align-items: center;
   height: 100%;
   width: 200px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-app-region: drag;
 }
 
 .excited-llama {
   height: 100%;
   width: 100%;
+}
+
+body {
+  background-color: #00000000;
 }

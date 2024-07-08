@@ -91,18 +91,33 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+    width: 450,
+    height: 682,
     show: false,
     frame: false,
     hasShadow: true,
+    center: true,
+    movable: true,
+    resizable: true,
+    maximizable: true,
+    minimizable: true,
   });
 
   mainWindow.setBounds(winBounds(store));
 
   const splash = new BrowserWindow({
-    width: 275,
-    height: 350,
-    transparent: true,
+    width: 225,
+    height: 340,
     frame: false,
+    hasShadow: true,
+    center: true,
+    movable: true,
+    resizable: false,
+    maximizable: false,
+    minimizable: false,
+    backgroundColor: "#00000000",
+    vibrancy: "popover",
+    visualEffectState: "followWindow",
   });
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -140,7 +155,7 @@ const createWindow = () => {
         llamaNodeCPP.temperature = store.get("temperature");
         splash.destroy();
         mainWindow.show();
-      }, 1500);
+      }, 3000);
     });
   }
 
