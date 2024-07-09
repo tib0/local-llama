@@ -1,8 +1,6 @@
 # local-llama
 
-![Logo](./src/assets/logo.webp)
-
-L³ or Local Llama is an electron app that runs Llama 3 models locally.
+Local Llama is an electron app that runs Llama 3 models locally.
 
 ## Feature
 
@@ -19,19 +17,19 @@ Download the latest release from [here](https://github.com/tib0/local-llama/rele
 ## Screens
 
 ### Dark theme
+
 ![Dark chat h](./static/d-h-chat.webp) 
 
-![Dark chat v](./static/d-v-chat.webp) 
-
 ### Light theme
-![Light chat h](./static/l-h-chat.webp)
 
-![Light chat v](./static/l-v-chat.webp)
+![Light chat h](./static/l-h-chat.webp)
 
 ## App settings
 
+Settings are available in the app.
 ![Zoom on button](./static/zoom-button.webp) 
 
+You can customize your system prompt
 ![Zoom on system prompt](./static/zoom-sprompt.webp) 
 
 ## Project Setup
@@ -83,17 +81,5 @@ $ npm run make
  
  **node-llama-cpp**: Awsome node wrapper for llama [here](https://github.com/withcatai/node-llama-cpp).
 
-<style type="text/css">
-  ul {
-    list-style-type: none;  
-  }
-  img {
-    max-width: 550px;
-    max-height: 350px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: auto;
-    height: auto;
-  }
-</style>
+![Logo](./src/assets/logo.webp)
+
