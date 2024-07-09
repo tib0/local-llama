@@ -1,8 +1,8 @@
 {
   "name": "local-llama",
-  "productName": "L³",
+  "productName": "Local Llama",
   "version": "0.0.1",
-  "description": "L³ is an electron app that runs llama 3 models locally",
+  "description": "L³ or Local Llama is an electron app that runs Llama 3 models locally",
   "author": {
     "name": "Tib0",
     "url": "https://github.com/tib0/local-chat.git"
