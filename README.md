@@ -3,6 +3,9 @@
 <p align="center">
   <img src="./.github/logo_25.webp" />
 </p>
+<p align="center" style="font-size:18px; font-weight:800; margin: 5px;">
+  v0.0.1
+</p>
 <p align="center" style="font-size:18px; font-weight:600; margin-bottom: 10px;">
   Local Llama also known as L³ is designed to be easy to use, with a user-friendly interface and advanced settings.
 </p>
@@ -53,7 +56,7 @@ model should work with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [Local.Llama-darwin-arm64-0.0.1.zip](https://github.com/tib0/local-llama/releases#:~:text=Local.Llama%2Ddarwin%2Darm64%2D0.0.1.zip).
+   [MacOS.arm.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.1/MacOS.arm.local-llama.zip).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -65,7 +68,7 @@ model should work with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [Local.Llama-darwin-x64-0.0.1.zip](https://github.com/tib0/local-llama/releases/download/0.0.1/Local.Llama-darwin-x64-0.0.1.zip).
+   [MacOS.x64.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.1/MacOS.x64.local-llama.zip).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -78,7 +81,7 @@ model should work with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [Local.Llama-0.0.1.Setup.exe](https://github.com/tib0/local-llama/releases/download/0.0.1/Local.Llama-0.0.1.Setup.exe).
+   [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.1/Windows.local-llama.exe).
 2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
    right place.
 3. Launch the app `Local Llama`.
