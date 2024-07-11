@@ -1,7 +1,55 @@
+import { app } from "electron";
+import path from "path";
+import { spawn as cpSpawn } from "child_process";
+
+function handleSquirrelEvent() {
+  if (process.argv.length === 1) {
+    return false;
+  }
+
+  const appFolder = path.resolve(process.execPath, "..");
+  const rootAtomFolder = path.resolve(appFolder, "..");
+  const updateDotExe = path.resolve(path.join(rootAtomFolder, "Update.exe"));
+  const exeName = path.basename(process.execPath);
+
+  const spawn = function (command, args) {
+    let spawnedProcess;
+
+    try {
+      spawnedProcess = cpSpawn(command, args, { detached: true });
+    } catch (error) {
+      console.error(error);
+    }
+
+    return spawnedProcess;
+  };
+
+  const spawnUpdate = function (args) {
+    return spawn(updateDotExe, args);
+  };
+
+  const squirrelEvent = process.argv[1];
+
+  switch (squirrelEvent) {
+    case "--squirrel-install":
+    case "--squirrel-updated":
+      spawnUpdate(["--createShortcut", exeName]);
+      return true;
+    case "--squirrel-uninstall":
+      spawnUpdate(["--removeShortcut", exeName]);
+      return true;
+    case "--squirrel-obsolete":
+      return true;
+  }
+}
+
+if (handleSquirrelEvent()) {
+  app.quit();
+}
+
 import {
   Menu,
   BrowserWindow,
-  app,
   ipcMain,
   net,
   protocol,
@@ -12,7 +60,6 @@ import {
 import Store from "electron-store";
 import fs from "fs";
 import os from "os";
-import path from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
 import { appMenu, appContextMenu, winBounds } from "./backend/appConfig";
@@ -96,7 +143,6 @@ const createWindow = () => {
     show: false,
     frame: false,
     hasShadow: true,
-    center: true,
     movable: true,
     resizable: true,
     maximizable: true,
@@ -121,10 +167,13 @@ const createWindow = () => {
     backgroundMaterial: "acrylic",
   });
 
+  // eslint-disable-next-line no-undef
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    // eslint-disable-next-line no-undef
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
+      // eslint-disable-next-line no-undef
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }

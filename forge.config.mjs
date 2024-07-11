@@ -15,6 +15,9 @@ export default {
         authors: "Tib0",
         description: "L³ or Local Llama is an electron app that runs Llama 3 models locally",
         iconUrl: "app://./static/icon.png",
+        loadingGif: "static/waitin-lama.gif",
+        setupIcon: "static/icon.ico",
+        name: "LocalLlamaChatApp",
       },
     },
     {
