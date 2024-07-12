@@ -4,7 +4,7 @@
   <img src="./.github/logo_25.webp" />
 </p>
 <p align="center" style="font-size:18px; font-weight:800; margin: 5px;">
-  v0.0.2
+  v0.0.3
 </p>
 <p align="center" style="font-size:18px; font-weight:600; margin-bottom: 10px;">
   Local Llama also known as L³ is designed to be easy to use, with a user-friendly interface and advanced settings.
@@ -56,7 +56,7 @@ model will be compatible with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [MacOS.arm.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.2/MacOS.arm.local-llama.zip).
+   [MacOS.arm.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.3/MacOS.arm.local-llama.zip).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -68,7 +68,7 @@ model will be compatible with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [MacOS.x64.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.2/MacOS.x64.local-llama.zip).
+   [MacOS.x64.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.3/MacOS.x64.local-llama.zip).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -81,7 +81,7 @@ model will be compatible with Local Llama.
   </summary>
 
 1. Download the latest release from
-   [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.2/Windows.local-llama.exe).
+   [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.3/Windows.local-llama.exe).
 2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
    right place.
 3. Launch the app `Local Llama`.
@@ -254,12 +254,14 @@ $ npm run make
 
 **Npm (10.x or higher)** - Local Llama requires a compatible version of npm to run.
 
+**Python (3)** - Python 3 is used during node-llama-cpp build.
+
 **GGUF Model** - Local Llama uses the llama-cpp as its core AI engine. It can use any gguf
 models. If you want, you can find model at
 [Hugginface](https://huggingface.co/models?search=gguf)
 
-**8GB RAM** - While it depends on the model size, it is recommended to have at least 8GB RAM to
-run this app.
+**4GB RAM** - While it depends on the model size, it is recommended to have at least 4GB of free
+ RAM to run this app.
 
 ## Dependencies
 
@@ -296,9 +298,9 @@ run this app.
 - **uuid v10.x**
 
 ## License
-
+CC-BY-NC-ND :
 > ##
->
+> ### 
 > #### You are free to:
 >
 > - **Share** — copy and redistribute the material in any medium or format. The licensor cannot
