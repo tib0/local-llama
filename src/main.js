@@ -105,11 +105,14 @@ const promptSystem = `You are an assistant to a human being.`;
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
 
-const availableModels = fs
-  .readdirSync(modelDir, { withFileTypes: true })
-  .filter((item) => !item.isDirectory())
-  .filter((item) => item.name.includes(".gguf"))
-  .map((item) => path.join(modelDir, item.name));
+const availableModels =
+  modelDir && modelDir !== "" && fs.existsSync(modelsFolder)
+    ? fs
+        .readdirSync(modelDir, { withFileTypes: true })
+        .filter((item) => !item.isDirectory())
+        .filter((item) => item.name.includes(".gguf"))
+        .map((item) => path.join(modelDir, item.name))
+    : [];
 
 if (!store.get("selected_model") || !fs.existsSync(store.get("selected_model"))) {
   if (availableModels.length === 0 || !fs.existsSync(availableModels[0])) {
@@ -138,33 +141,34 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
-    width: 450,
-    height: 682,
-    show: false,
+    center: true,
     frame: false,
     hasShadow: true,
-    movable: true,
-    resizable: true,
+    height: 682,
     maximizable: true,
     minimizable: true,
+    movable: true,
+    resizable: true,
+    show: false,
+    width: 450,
   });
 
   mainWindow.setBounds(winBounds(store));
 
   const splash = new BrowserWindow({
-    width: 225,
-    height: 340,
+    backgroundColor: "#00000000",
+    backgroundMaterial: "auto",
+    center: true,
     frame: false,
     hasShadow: true,
-    center: true,
-    movable: true,
-    resizable: false,
+    height: 340,
     maximizable: false,
     minimizable: false,
-    backgroundColor: "#00000000",
+    movable: true,
+    resizable: false,
     vibrancy: "popover",
     visualEffectState: "followWindow",
-    backgroundMaterial: "acrylic",
+    width: 225,
   });
 
   // eslint-disable-next-line no-undef
