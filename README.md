@@ -1,4 +1,4 @@
-# L³ - Local Llama
+# L³, Local Llama
 
 <p align="center">
   <img src="./.github/logo_25.webp" />
@@ -11,14 +11,14 @@
 </p>
 
 <p align="center" style="margin: 5px;">
-  L³ allows you to select different gguf models and run them locally without relying on external servers or APIs.
+  L³ enables you to choose various gguf models and execute them locally without depending on external servers or APIs.
 </p>
 <p align="center" style="margin: 5px;">
-  You are able to save their conversation history and load it later.
+  You can save conversation history and retrieve it later.
 </p>
 
 <p align="center" style="margin: 5px;">
-  With L³ you have full control over the models used and how it is setup, making it an ideal solution for anyone who wan't to chat with LLM models while offline.
+  With L³, you have complete control over the models used and their configuration, making it an ideal solution for anyone who wants to chat with LLM models offline.
 </p>
 
 ### Features
@@ -45,8 +45,7 @@
 
 ### Find a gguf model
 
-You can download a model from [Hugginface](https://huggingface.co/models?search=gguf). Any gguf
-model should work with Local Llama.
+You can download a model from [Hugginface](https://huggingface.co/models?search=gguf). Any gguf model will be compatible with Local Llama.
 
 ### Mac OS
 
@@ -82,8 +81,7 @@ model should work with Local Llama.
 
 1. Download the latest release from
    [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.2/Windows.local-llama.exe).
-2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
-   right place.
+2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the right place.
 3. Launch the app `Local Llama`.
 </details>
 
@@ -94,9 +92,8 @@ model should work with Local Llama.
     All
   </summary>
 
-1.  Build and make the app from sources by looking at "Use from source" section. Use the
-    package or make command.
-2.  Go to folder out > make to find the generated file.
+1.  Build and make the app from sources by looking at "Use from source" section. Utilize either the `npm run package` or `npm run make` command.
+2.  Navigate to the `out` folder within your project's root directory, where you will find the generated file.
 </details>
 
 ## Screenshots
@@ -144,9 +141,8 @@ model should work with Local Llama.
 - **Auto**: This dropdown is used to select where computations are performed. On Macos, in
   newer M type processor you can only select `auto` or `metal` option. On Windows, you can
   choose `auto`, `none` or `vulkan` option.
-- **History...**: This button open up a browse window where you can select the history file to
-  load. History file are JSON representation of you conversation.
-- **Clear**: It clear the history reset the current session.
+- **History...**: This button will open a file browser window, allowing you to choose the history file to load. History files are JSON representations of your conversations.
+- **Clear**: This button clear the history and reset the current session.
 - **Save**: This button is used to save the current session into a file. The file is a JSON
   representation of the conversation. File extension is `.lllh`
 - **Slider**: This slider is used to control the temperature of the next user prompt.
@@ -177,8 +173,7 @@ model should work with Local Llama.
 
 ### Extended informations
 
-By clicking on the **Model name** button, you will be able to see the following informations
-about the currently selected model.
+By clicking on the "Model name" toggle, you can view detailed information about the currently selected model.
 
 <p align="left">
   <img height="350px" style="padding:10px;" src="./.github/l-v-settings_55.webp" />
@@ -201,9 +196,9 @@ You can update the system prompt in here:
 
 ## How it works
 
-Local Llama uses a combination of electron and llama-node-cpp to run Llama 3 models locally on
-your machine. The app interacts with the llama-node-cpp library, which wraps the Llama 3 model
-in a node.js module. This allows for seamless integration with electron and native code.
+Local Llama integrates Electron and llama-node-cpp to enable running Llama 3 models locally on your machine. 
+
+The app interacts with the llama-node-cpp library, which encapsulates the Llama 3 model within a node.js module, ensuring smooth compatibility with both Electron and native code.
 
 ## Use from source
 
