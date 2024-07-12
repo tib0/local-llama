@@ -45,7 +45,8 @@
 
 ### Find a gguf model
 
-You can download a model from [Hugginface](https://huggingface.co/models?search=gguf). Any gguf model will be compatible with Local Llama.
+You can download a model from [Hugginface](https://huggingface.co/models?search=gguf). Any gguf
+model will be compatible with Local Llama.
 
 ### Mac OS
 
@@ -81,7 +82,8 @@ You can download a model from [Hugginface](https://huggingface.co/models?search=
 
 1. Download the latest release from
    [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.2/Windows.local-llama.exe).
-2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the right place.
+2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
+   right place.
 3. Launch the app `Local Llama`.
 </details>
 
@@ -92,8 +94,10 @@ You can download a model from [Hugginface](https://huggingface.co/models?search=
     All
   </summary>
 
-1.  Build and make the app from sources by looking at "Use from source" section. Utilize either the `npm run package` or `npm run make` command.
-2.  Navigate to the `out` folder within your project's root directory, where you will find the generated file.
+1.  Build and make the app from sources by looking at "Use from source" section. Utilize either
+    the `npm run package` or `npm run make` command.
+2.  Navigate to the `out` folder within your project's root directory, where you will find the
+generated file.
 </details>
 
 ## Screenshots
@@ -141,7 +145,8 @@ You can download a model from [Hugginface](https://huggingface.co/models?search=
 - **Auto**: This dropdown is used to select where computations are performed. On Macos, in
   newer M type processor you can only select `auto` or `metal` option. On Windows, you can
   choose `auto`, `none` or `vulkan` option.
-- **History...**: This button will open a file browser window, allowing you to choose the history file to load. History files are JSON representations of your conversations.
+- **History...**: This button will open a file browser window, allowing you to choose the
+  history file to load. History files are JSON representations of your conversations.
 - **Clear**: This button clear the history and reset the current session.
 - **Save**: This button is used to save the current session into a file. The file is a JSON
   representation of the conversation. File extension is `.lllh`
@@ -173,7 +178,8 @@ You can download a model from [Hugginface](https://huggingface.co/models?search=
 
 ### Extended informations
 
-By clicking on the "Model name" toggle, you can view detailed information about the currently selected model.
+By clicking on the "Model name" toggle, you can view detailed information about the currently
+selected model.
 
 <p align="left">
   <img height="350px" style="padding:10px;" src="./.github/l-v-settings_55.webp" />
@@ -196,9 +202,11 @@ You can update the system prompt in here:
 
 ## How it works
 
-Local Llama integrates Electron and llama-node-cpp to enable running Llama 3 models locally on your machine. 
+Local Llama integrates Electron and llama-node-cpp to enable running Llama 3 models locally on
+your machine.
 
-The app interacts with the llama-node-cpp library, which encapsulates the Llama 3 model within a node.js module, ensuring smooth compatibility with both Electron and native code.
+The app interacts with the llama-node-cpp library, which encapsulates the Llama 3 model within
+a node.js module, ensuring smooth compatibility with both Electron and native code.
 
 ## Use from source
 
