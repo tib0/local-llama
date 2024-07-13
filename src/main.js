@@ -445,6 +445,9 @@ async function changeModel() {
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("model-changed", store.get("selected_model") ?? "");
+    }
     return;
   }
   await loadModel(undefined, filePaths[0]);

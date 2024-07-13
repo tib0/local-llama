@@ -18,12 +18,13 @@ const ChatForm = () => {
     title: [],
   });
   const [prompt, setPrompt] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingPrompt, setLoadingPrompt] = useState<boolean>(false);
+  const [loadingModel, setLoadingModel] = useState<boolean>(false);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
   const [currentModel, setCurrentModel] = usePersistentStorageValue<string | undefined>(
     "currentModel",
   );
-  const [model, setModel] = useState<string | undefined>(currentModel);
+  const [lastModel, setLastModel] = useState<string>("");
   const [_currentGpuUse, setCurrentGpuUse] = usePersistentStorageValue<string | undefined>(
     "currentGpuUse",
   );
@@ -36,13 +37,14 @@ const ChatForm = () => {
 
   function init() {
     setPrompt("");
-    setLoading(false);
+    setLoadingPrompt(false);
     setError({});
   }
 
   async function sendPrompt() {
     if (
-      loading ||
+      loadingPrompt ||
+      loadingModel ||
       prompt === undefined ||
       prompt.trim() === "" ||
       prompt.split(" ").length < 2
@@ -55,13 +57,13 @@ const ChatForm = () => {
     });
 
     init();
-    setLoading(true);
+    setLoadingPrompt(true);
 
     const start = Date.now();
     await window.electronAPI.chat(prompt).then((response: string) => {
       if (response) {
         const end = Date.now();
-        const elapsed = new Date(end - start).toISOString().substr(11, 8);
+        const elapsed = new Date(end - start).toISOString().substring(11, 11 + 8);
         dispatch({
           type: "PROMPT_CHAT",
           payload: [
@@ -70,7 +72,7 @@ const ChatForm = () => {
         });
       }
     });
-    setLoading(false);
+    setLoadingPrompt(false);
   }
 
   async function clearHistory() {
@@ -81,9 +83,10 @@ const ChatForm = () => {
   }
 
   async function changeModel() {
-    setLoading(true);
+    setLoadingModel(true);
+    setLastModel(currentModel);
+    setCurrentModel("Loading model, please wait");
     window.electronAPI.changeModel();
-    setLoading(false);
   }
 
   const handleSelectGpuChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -134,18 +137,22 @@ const ChatForm = () => {
   }, [chatHistory]);
 
   useEffect(() => {
-    if (!loading) inputRef.current?.focus();
+    if (!loadingPrompt) inputRef.current?.focus();
+  }, [loadingPrompt]);
+
+  useEffect(() => {
     window.electronAPI.onModelChange((modelPath) => {
       if (!modelPath) {
+        setCurrentModel(lastModel);
         return;
       }
-      setModel(modelPath);
       setCurrentModel(modelPath);
       dispatch({
         type: "CLEAR_HISTORY",
       });
+      setLoadingModel(false);
     });
-  }, [loading]);
+  }, []);
 
   return (
     <form
@@ -237,8 +244,8 @@ const ChatForm = () => {
         </div>
       </div>
       <div className="flex justify-start gap-2 items-center w-full pt-3 pb-1 px-0">
-        {model ? (
-          <ModelInfos model={model} />
+        {currentModel ? (
+          <ModelInfos model={currentModel} />
         ) : (
           "Missing model, read the instruction if needed"
         )}
@@ -268,7 +275,7 @@ const ChatForm = () => {
             placeholder={`Start typing here, and press enter or click on the button`}
             onChange={(e) => setPrompt(e.target.value)}
             value={prompt}
-            disabled={loading}
+            disabled={loadingPrompt}
           />
           <div className="hidden justify-center sm:flex w-2/12">
             <kbd
@@ -302,7 +309,7 @@ const ChatForm = () => {
             </button>
           </div>
         </label>
-        {loading && <ChatBubbleSkeleton />}
+        {loadingPrompt && <ChatBubbleSkeleton />}
         {history.toReversed().map((c: ChatHistoryItem, index) => {
           switch (c.type) {
             case "model":
