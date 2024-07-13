@@ -380,11 +380,11 @@ function ModelInfos({ model }: { model: string }) {
         </div>
       ) : (
         <div className="flex flex-row items-center justify-between w-full pt-4 pr-3">
-          <div className="flex-grow-0 w-16 text-center flex items-center justify-center font-black text-lg transition-all">
-            <div className="skeleton w-7 h-8 bg-white/90 mb-1 rounded-full border-[3px] border-primary" />
+          <div className="w-16 flex flex-grow-0 items-center justify-center">
+            <div className="skeleton bg-base-100/90 w-8 h-10 border-primary border-[3px] rounded-t-full rounded-b-md overflow-hidden" />
           </div>
           <div className="flex-grow-1 w-full text-center flex items-center justify-center">
-            <div className="skeleton h-8 w-full" />
+            <div className="skeleton h-4 w-full ml-4" />
           </div>
         </div>
       )}
