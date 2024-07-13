@@ -5,6 +5,7 @@ import { MicIcon } from "../lib/icons";
 import { ChatContext } from "../providers/chat";
 import images from "../lib/images";
 import { titleCase } from "../lib/text";
+import { getSep } from "../lib/os";
 
 function ModelInfos({ model }: { model: string }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
@@ -14,10 +15,11 @@ function ModelInfos({ model }: { model: string }) {
   const [tempIco, setTempIco] = useState<string>(images.blue);
   const interval = useRef(null);
   const { dispatch } = useContext(ChatContext);
+  const pathSeparator = getSep();
 
   const modelName =
-    model.split("/").length > 0
-      ? model.split("/")[model.split("/").length - 1]
+    model.split(pathSeparator).length > 0
+      ? model.split(pathSeparator)[model.split(pathSeparator).length - 1]
       : "Missing model";
 
   async function getModelInfo() {
