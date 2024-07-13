@@ -11,7 +11,7 @@ function ModelInfos({ model }: { model: string }) {
   const [systemPrompt, setSystemPrompt] = useState<string>("");
   const [temperature, setTemperature] = useState<number>(0);
   const [expandedView, setExpandedView] = useState<boolean>(false);
-  const [tempIco, setTempIco] = useState<any>(null);
+  const [tempIco, setTempIco] = useState<string>(images.blue);
   const interval = useRef(null);
   const { dispatch } = useContext(ChatContext);
 
@@ -28,22 +28,22 @@ function ModelInfos({ model }: { model: string }) {
   const defineTempIco = (temp: number) => {
     if (temp) {
       switch (true) {
-        case temp === 0:
-          setTempIco(images.blue);
-          break;
         case temp > 80:
           setTempIco(images.red);
           break;
         case temp > 50:
           setTempIco(images.yellow);
           break;
-        case temp > 35:
+        case temp > 30:
           setTempIco(images.green);
           break;
         case temp > 15:
           setTempIco(images.blue);
           break;
         case temp > 0:
+          setTempIco(images.blue);
+          break;
+        default:
           setTempIco(images.blue);
           break;
       }
