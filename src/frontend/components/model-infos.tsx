@@ -97,13 +97,13 @@ function ModelInfos({ model }: { model: string }) {
   }, []);
 
   useEffect(() => {
-    if (!temperature) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
-    defineTempIco(temperature);
+    if (!temperature || isNaN(temperature)) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
+    defineTempIco(temperature ?? 0);
   }, [modelInfo?.llama?.temperature, temperature]);
 
   useEffect(() => {
-    setTemperature(modelInfo?.llama?.temperature * 50);
-    defineTempIco(modelInfo?.llama?.temperature * 50);
+    setTemperature(!temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50);
+    defineTempIco(!temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50);
   }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
   return (
@@ -161,7 +161,8 @@ function ModelInfos({ model }: { model: string }) {
 
               {modelInfo &&
                 modelInfo.llama &&
-                typeof modelInfo.llama.temperature === "number" && (
+                typeof modelInfo.llama.temperature === "number" &&
+                !isNaN(modelInfo?.llama?.temperature) && (
                   <div className="flex flex-col items-center justify-stretch w-full pt-4">
                     <div className="w-full">
                       <span className="text-base font-normal text-base-content/90">
