@@ -260,8 +260,8 @@ $ npm run make
 models. If you want, you can find model at
 [Hugginface](https://huggingface.co/models?search=gguf)
 
-**4GB RAM** - While it depends on the model size, it is recommended to have at least 4GB of free
- RAM to run this app.
+**4GB RAM** - While it depends on the model size, it is recommended to have at least 4GB of
+free RAM to run this app.
 
 ## Dependencies
 
@@ -298,9 +298,11 @@ models. If you want, you can find model at
 - **uuid v10.x**
 
 ## License
+
 CC-BY-NC-ND :
+
 > ##
-> ### 
+>
 > #### You are free to:
 >
 > - **Share** — copy and redistribute the material in any medium or format. The licensor cannot
