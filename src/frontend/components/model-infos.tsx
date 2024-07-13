@@ -91,7 +91,7 @@ function ModelInfos({ model }: { model: string }) {
   useEffect(() => {
     interval.current = setInterval(async () => {
       await getModelInfo();
-    }, 777);
+    }, 2000);
     return () => {
       debouncedRangeChangeHandler.cancel();
       clearInterval(interval.current);
@@ -99,12 +99,15 @@ function ModelInfos({ model }: { model: string }) {
   }, []);
 
   useEffect(() => {
-    if (!temperature || isNaN(temperature)) setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
+    if (!temperature || isNaN(temperature))
+      setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
     defineTempIco(temperature ?? 0);
   }, [modelInfo?.llama?.temperature, temperature]);
 
   useEffect(() => {
-    setTemperature(!temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50);
+    setTemperature(
+      !temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50,
+    );
     defineTempIco(!temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50);
   }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
