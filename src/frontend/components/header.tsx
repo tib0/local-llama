@@ -42,9 +42,9 @@ const Header = () => {
           About
         </Link>
       </li>
-      <li key={"aboutLink" + src}>
+      <li key={"quitLink" + src}>
         <a
-          key="aboutLink"
+          key="quitLink"
           className={`
             mx-2 font-light text-lg hover:cursor-pointer
           `}
