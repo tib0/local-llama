@@ -5,7 +5,7 @@ export default {
     compression: "store",
     appCategoryType: "public.app-category.utilities",
     icon: "./static/icon",
-    darwinDarkModeSupport: "true",
+    darwinDarkModeSupport: true,
   },
   rebuildConfig: {},
   makers: [
