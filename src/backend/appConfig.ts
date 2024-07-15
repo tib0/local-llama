@@ -1,4 +1,40 @@
 import { Menu, MenuItem, shell } from "electron";
+import path from "path";
+
+export const promptSystem = `You are an assistant to a human being.`;
+
+export const mainWindowOptions = (dirname: string) =>
+  ({
+    webPreferences: {
+      preload: path.join(dirname, "preload.js"),
+    },
+    center: true,
+    frame: false,
+    hasShadow: true,
+    height: 682,
+    maximizable: true,
+    minimizable: true,
+    movable: true,
+    resizable: true,
+    show: false,
+    width: 450,
+  }) as Electron.BrowserWindowConstructorOptions;
+
+export const splashWindowOptions: Electron.BrowserWindowConstructorOptions = {
+  backgroundColor: "#00000000",
+  backgroundMaterial: "acrylic",
+  center: true,
+  frame: false,
+  hasShadow: true,
+  height: 340,
+  maximizable: false,
+  minimizable: false,
+  movable: true,
+  resizable: false,
+  vibrancy: "popover",
+  visualEffectState: "followWindow",
+  width: 225,
+};
 
 export function appMenu(store) {
   const isMacOS = process.platform === "darwin";

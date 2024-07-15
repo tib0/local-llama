@@ -1,175 +1,72 @@
 import { app } from "electron";
-import path from "path";
-import { spawn as cpSpawn } from "child_process";
+import { handleSquirrelEvent } from "./backend/windowsSquirelInstallEvent";
 
-function handleSquirrelEvent() {
-  if (process.argv.length === 1) {
-    return false;
-  }
-
-  const appFolder = path.resolve(process.execPath, "..");
-  const rootAtomFolder = path.resolve(appFolder, "..");
-  const updateDotExe = path.resolve(path.join(rootAtomFolder, "Update.exe"));
-  const exeName = path.basename(process.execPath);
-
-  const spawn = function (command, args) {
-    let spawnedProcess;
-
-    try {
-      spawnedProcess = cpSpawn(command, args, { detached: true });
-    } catch (error) {
-      console.error(error);
-    }
-
-    return spawnedProcess;
-  };
-
-  const spawnUpdate = function (args) {
-    return spawn(updateDotExe, args);
-  };
-
-  const squirrelEvent = process.argv[1];
-
-  switch (squirrelEvent) {
-    case "--squirrel-install":
-    case "--squirrel-updated":
-      spawnUpdate(["--createShortcut", exeName]);
-      return true;
-    case "--squirrel-uninstall":
-      spawnUpdate(["--removeShortcut", exeName]);
-      return true;
-    case "--squirrel-obsolete":
-      return true;
-  }
-}
-
-if (handleSquirrelEvent()) {
+if (handleSquirrelEvent() || !app.requestSingleInstanceLock()) {
   app.quit();
 }
 
 import {
-  Menu,
   BrowserWindow,
+  Menu,
+  clipboard,
+  dialog,
   ipcMain,
   net,
   protocol,
-  dialog,
-  clipboard,
   shell,
 } from "electron";
-import Store from "electron-store";
 import fs from "fs";
 import os from "os";
+import path from "path";
+import Store from "electron-store";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
-import { appMenu, appContextMenu, winBounds } from "./backend/appConfig";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const cache = path.join(os.homedir(), ".cache/local-llama");
-const modelsFolder = path.join(cache, "models");
-const historyFolder = path.join(cache, "history");
-const logsFolder = path.join(cache, "logs");
+import { appContextMenu, appMenu, promptSystem, winBounds } from "./backend/appConfig";
+import { initFolder, initSelectedModel, initStoreValue } from "./backend/appHelpers";
+import { mainWindowOptions } from "./backend/appConfig";
+import { splashWindowOptions } from "./backend/appConfig";
 
 const store = new Store();
 
 let llamaNodeCPP = new LlamaWrapper();
 
-let isSingleInstance = app.requestSingleInstanceLock();
-if (!isSingleInstance) {
-  app.quit();
-}
-
-const modelDir = store.get("model_dir");
-if (!modelDir || !fs.existsSync(modelsFolder)) {
-  const defaultModelDir = modelsFolder;
-  fs.mkdirSync(defaultModelDir, { recursive: true });
-  store.set("model_dir", defaultModelDir ?? "");
-}
-
-const logDir = store.get("log_dir");
-if (!logDir || !fs.existsSync(logsFolder)) {
-  const defaultLogDir = logsFolder;
-  fs.mkdirSync(defaultLogDir, { recursive: true });
-  store.set("log_dir", defaultLogDir ?? "");
-}
-
-const historyDir = store.get("history_dir");
-if (!historyDir || !fs.existsSync(historyFolder)) {
-  const defaultHistoryDir = historyFolder;
-  fs.mkdirSync(defaultHistoryDir, { recursive: true });
-  store.set("history_dir", defaultHistoryDir ?? "");
-}
-
-const promptSystem = `You are an assistant to a human being.`;
-
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
 
-const availableModels =
-  modelDir && modelDir !== "" && fs.existsSync(modelsFolder)
-    ? fs
-        .readdirSync(modelDir, { withFileTypes: true })
-        .filter((item) => !item.isDirectory())
-        .filter((item) => item.name.includes(".gguf"))
-        .map((item) => path.join(modelDir, item.name))
-    : [];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const cache = path.join(os.homedir(), ".cache/local-llama");
 
-if (!store.get("selected_model") || !fs.existsSync(store.get("selected_model"))) {
-  if (availableModels.length === 0 || !fs.existsSync(availableModels[0])) {
-    store.set("selected_model", "");
-  }
-  store.set("selected_model", availableModels[0] ?? "");
-}
+const modelsFolderName = "models";
+const historyFolderName = "history";
+const logsFolderName = "logs";
+const seletedModelName = "selected_model";
+const gpuName = "gpu";
+const temperatureName = "temperature";
+const systemPromptName = "prompt_system";
 
-if (!store.get("gpu")) {
-  store.set("gpu", "auto");
-}
+const defaultGPU = "auto";
+const defaultTemperature = 0;
 
-if (!store.get("temperature")) {
-  store.set("temperature", 0);
-}
+const historyFileExtension = "lllh";
+const modelFileExtension = "gguf";
 
-app.whenReady().then(() => {
-  protocol.handle("app", (req) => {
-    const { pathname } = new URL(req.url);
-    return net.fetch(pathToFileURL(pathname).toString());
-  });
-});
+const modelsFolderPath = path.join(cache, modelsFolderName);
+const historyFolderPath = path.join(cache, historyFolderName);
+const logsFolderPath = path.join(cache, logsFolderName);
+
+initFolder(store, modelsFolderPath, modelsFolderName);
+initFolder(store, historyFolderPath, historyFolderName);
+initFolder(store, logsFolderPath, logsFolderName);
+
+initSelectedModel(store, modelsFolderPath, seletedModelName, modelFileExtension);
+initStoreValue(store, gpuName, defaultGPU);
+initStoreValue(store, temperatureName, defaultTemperature);
 
 const createWindow = () => {
-  const mainWindow = new BrowserWindow({
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-    },
-    center: true,
-    frame: false,
-    hasShadow: true,
-    height: 682,
-    maximizable: true,
-    minimizable: true,
-    movable: true,
-    resizable: true,
-    show: false,
-    width: 450,
-  });
+  const mainWindow = new BrowserWindow(mainWindowOptions(__dirname));
+  const splash = new BrowserWindow(splashWindowOptions);
 
   mainWindow.setBounds(winBounds(store));
-
-  const splash = new BrowserWindow({
-    backgroundColor: "#00000000",
-    backgroundMaterial: "auto",
-    center: true,
-    frame: false,
-    hasShadow: true,
-    height: 340,
-    maximizable: false,
-    minimizable: false,
-    movable: true,
-    resizable: false,
-    vibrancy: "popover",
-    visualEffectState: "followWindow",
-    width: 225,
-  });
 
   // eslint-disable-next-line no-undef
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -202,11 +99,11 @@ const createWindow = () => {
     appContextMenu(params, mainWindow);
   });
 
-  function showFunc() {
+  function showWindow() {
     mainWindow.once("ready-to-show", () => {
       setTimeout(async function () {
         await loadModel();
-        llamaNodeCPP.temperature = store.get("temperature");
+        llamaNodeCPP.temperature = store.get(temperatureName);
         splash.destroy();
         mainWindow.show();
       }, 3000);
@@ -215,10 +112,30 @@ const createWindow = () => {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(appMenu(store)));
 
-  showFunc();
+  showWindow();
 };
 
 app.on("ready", createWindow);
+
+app.on("window-all-closed", () => {
+  llamaNodeCPP.disposeModel();
+  llamaNodeCPP.disposeSession();
+  llamaNodeCPP = undefined;
+  app.quit();
+});
+
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+app.whenReady().then(() => {
+  protocol.handle("app", (req) => {
+    const { pathname } = new URL(req.url);
+    return net.fetch(pathToFileURL(pathname).toString());
+  });
+});
 
 ipcMain.handle("model-load", loadModel);
 
@@ -246,19 +163,6 @@ ipcMain.on("open-external-link", openExternalLink);
 
 ipcMain.on("clipboard-copy", clipboardCopy);
 
-app.on("window-all-closed", () => {
-  llamaNodeCPP.disposeModel();
-  llamaNodeCPP.disposeSession();
-  llamaNodeCPP = undefined;
-  app.quit();
-});
-
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
-
 async function clipboardCopy(_event, content) {
   clipboard.writeText(content, "clipboard");
 }
@@ -268,7 +172,7 @@ async function openExternalLink(_event, href) {
 }
 
 async function loadModel(_event, modelPath) {
-  const selectedModelPath = modelPath ?? store.get("selected_model");
+  const selectedModelPath = modelPath ?? store.get(seletedModelName);
 
   if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
     return "";
@@ -276,14 +180,14 @@ async function loadModel(_event, modelPath) {
 
   if (!llamaNodeCPP.isReady()) {
     await llamaNodeCPP.loadModule();
-    await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
+    await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
 
   if (
     llamaNodeCPP.isReady() &&
     (await llamaNodeCPP.getInfos()).model !== undefined &&
     selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename) &&
-    store.get("gpu") === (await llamaNodeCPP.getInfos()).model?.gpu
+    store.get(gpuName) === (await llamaNodeCPP.getInfos()).model?.gpu
   ) {
     return selectedModelPath;
   }
@@ -293,36 +197,35 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeSession();
     await llamaNodeCPP.disposeLlama();
-    await llamaNodeCPP.loadLlama(store.get("gpu") === "false" ? false : store.get("gpu"));
+    await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
   await llamaNodeCPP.loadModel(selectedModelPath);
-  await llamaNodeCPP.initSession(store.get("prompt_system") ?? promptSystem);
+  await llamaNodeCPP.initSession(store.get(systemPromptName) ?? promptSystem);
 
   for (const window of BrowserWindow.getAllWindows()) {
     window.webContents.send("model-changed", selectedModelPath);
   }
 
-  store.set("selected_model", selectedModelPath ?? "");
+  store.set(seletedModelName, selectedModelPath ?? "");
 
   if (llamaNodeCPP.isReady()) {
     return selectedModelPath;
   } else {
-    store.set("selected_model", selectedModelPath ?? "");
-    store.set("gpu", "auto");
+    store.set(gpuName, defaultGPU);
     return "";
   }
 }
 
 async function saveHistory(_event) {
   const date = new Date();
-  const defaultFileName = `${date.toISOString().replaceAll(":", "-")}.lllh`;
+  const defaultFileName = `${date.toISOString().replaceAll(":", "-")}.${historyFileExtension}`;
   const result = await dialog.showSaveDialog({
     title: "Save file as",
-    defaultPath: path.join(store.get("history_dir"), defaultFileName),
+    defaultPath: path.join(store.get(historyFolderName), defaultFileName),
     filters: [
       {
         name: "Conversation history",
-        extensions: ["lllh"],
+        extensions: [historyFileExtension],
       },
     ],
   });
@@ -333,10 +236,10 @@ async function saveHistory(_event) {
     const history = await llamaNodeCPP.getHistory();
     const conversation = {
       history: history,
-      model_path: store.get("selected_model"),
-      prompt_system: store.get("prompt_system"),
-      gpu: store.get("gpu"),
-      temperature: store.get("temperature"),
+      model_path: store.get(seletedModelName),
+      prompt_system: store.get(systemPromptName),
+      gpu: store.get(gpuName),
+      temperature: store.get(temperatureName),
     };
     fs.writeFileSync(result.filePath, JSON.stringify(conversation), "utf-8");
   } catch (e) {
@@ -353,28 +256,20 @@ async function loadHistory(_event) {
     filters: [
       {
         name: "Conversation history",
-        extensions: ["lllh"],
+        extensions: [historyFileExtension],
       },
     ],
     title: "Load history from...",
-    defaultPath: store.get("history_dir"),
+    defaultPath: store.get(historyFolderName),
     properties: ["openFile"],
   });
   if (!result || result.canceled) return;
   try {
     historyParm = JSON.parse(fs.readFileSync(result.filePaths[0], "utf-8"));
-  } catch (e) {
-    console.log(e);
-    return;
-  }
-
-  try {
-    store.set("selected_model", historyParm.model_path ?? "");
-    store.set("prompt_system", historyParm.prompt_system ?? "");
-    store.set("gpu", historyParm.gpu ?? "");
-    store.set("temperature", historyParm.temperature ?? "");
-
-    llamaNodeCPP.temperature = store.get("temperature");
+    store.set(seletedModelName, historyParm.model_path ?? "");
+    store.set(systemPromptName, historyParm.prompt_system ?? "");
+    store.set(gpuName, historyParm.gpu ?? defaultGPU);
+    store.set(temperatureName, historyParm.temperature ?? defaultGPU);
 
     llamaNodeCPP.clearHistory();
     await llamaNodeCPP.disposeSession();
@@ -383,15 +278,16 @@ async function loadHistory(_event) {
 
     await loadModel();
     await llamaNodeCPP.setHistory(historyParm.history);
+    llamaNodeCPP.temperature = store.get(temperatureName);
     return historyParm.history;
   } catch (e) {
-    console.log(e, result);
+    console.error(e, result);
     return;
   }
 }
 
 async function changeModelGpuUse(_event, gpuUse) {
-  store.set("gpu", gpuUse);
+  store.set(gpuName, gpuUse);
   llamaNodeCPP.clearHistory();
   await llamaNodeCPP.disposeSession();
   await llamaNodeCPP.disposeModel();
@@ -400,7 +296,7 @@ async function changeModelGpuUse(_event, gpuUse) {
 }
 
 async function changeModelSystemPrompt(_event, promptSystem) {
-  store.set("prompt_system", promptSystem);
+  store.set(systemPromptName, promptSystem);
   llamaNodeCPP.clearHistory();
   await llamaNodeCPP.disposeSession();
   await llamaNodeCPP.disposeModel();
@@ -409,7 +305,7 @@ async function changeModelSystemPrompt(_event, promptSystem) {
 }
 
 async function changeTemperature(_event, temperature) {
-  store.set("temperature", temperature);
+  store.set(temperatureName, temperature);
 }
 
 async function quitApp(_event) {
@@ -429,24 +325,24 @@ async function getModelInfo() {
 
 async function chat(_event, userMessage) {
   if (!llamaNodeCPP.isReady()) {
-    return "No response";
+    return "Something went wrong. Try to choose another model or restart the application ";
   }
-  const temp = store.get("temperature");
+  const temp = store.get(temperatureName);
   const c = await llamaNodeCPP.prompt(userMessage, undefined, {
     temperature: temp,
   });
-  return c ?? "No response";
+  return c ?? "Something went wrong. Try to choose another model or restart the application ";
 }
 
 async function changeModel() {
   const { filePaths } = await dialog.showOpenDialog({
-    filters: [{ name: "Models", extensions: ["gguf"] }],
-    defaultPath: store.get("model_dir"),
+    filters: [{ name: "Models", extensions: [modelFileExtension] }],
+    defaultPath: store.get(modelsFolderName),
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
     for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("model-changed", store.get("selected_model") ?? "");
+      window.webContents.send("model-changed", store.get(seletedModelName) ?? "");
     }
     return;
   }
