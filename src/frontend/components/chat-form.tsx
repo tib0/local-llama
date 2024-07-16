@@ -275,7 +275,7 @@ const ChatForm = () => {
             placeholder={`Start typing here, and press enter or click on the button`}
             onChange={(e) => setPrompt(e.target.value)}
             value={prompt}
-            disabled={loadingPrompt}
+            disabled={loadingPrompt || loadingModel}
           />
           <div className="hidden justify-center sm:flex w-2/12">
             <kbd
