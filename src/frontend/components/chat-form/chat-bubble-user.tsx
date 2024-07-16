@@ -11,7 +11,7 @@ const ChatBubbleUser = ({ index, text }: { index: string; text: string }) => (
       <div className="prose w-full max-w-full">{"User :"}</div>
     </div>
     <div className="card-body p-0 text-left">
-      <div className="prose w-full max-w-full">{text.toString()}</div>
+      <div className="prose w-full max-w-full text-base">{text.toString()}</div>
     </div>
   </div>
 );
