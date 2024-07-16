@@ -10,9 +10,12 @@ export function speechSynthesis(textToSpeech: string) {
     return;
   }
 
-  const voice = window.speechSynthesis
-    .getVoices()
-    .filter((ssv) => ssv.lang.toLowerCase().includes("fr"))[1];
+  const voice =
+    window.speechSynthesis
+      .getVoices()
+      .filter((ssv) => ssv.lang.includes(Intl.DateTimeFormat().resolvedOptions().locale))[0] ??
+    window.speechSynthesis.getVoices()[0];
+
   if (!voice) return;
 
   if (!textToSpeech) return;
@@ -22,7 +25,7 @@ export function speechSynthesis(textToSpeech: string) {
 
   utterance.voice = voice;
   utterance.pitch = 0.95;
-  utterance.rate = 1.15;
+  utterance.rate = 1.1;
   utterance.volume = 1;
 
   synth.speak(utterance);
