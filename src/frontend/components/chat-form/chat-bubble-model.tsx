@@ -3,6 +3,12 @@ import { speechSynthesis } from "../../lib/textToSpeech";
 import MarkdownRenderer from "../markdown";
 
 const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => {
+  const content = text.slice(0, -10);
+  const regex = /[0-9][0-9]:[0-5][0-9]:[0-5][0-9]$/g;
+  const time = regex.test(text.slice(text.length - 10, text.length))
+    ? text.slice(text.length - 10, text.length)
+    : undefined;
+
   return (
     <div
       key={`model-chat-${index}`}
@@ -18,15 +24,20 @@ const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => {
         <div
           className={`hover:cursor-pointer rounded-full w-6 h-6`}
           tabIndex={0}
-          onClick={() => speechSynthesis(text)}
+          onClick={() => speechSynthesis(content)}
         >
           <SpeakerIcon />
         </div>
       </div>
       <div className="card-body p-0 text-left">
         <div className="prose prose-pre:bg-[#1E1E1E] prose-p:text-base prose-span:text-base w-full max-w-full ">
-          <MarkdownRenderer>{text}</MarkdownRenderer>
+          <MarkdownRenderer>{content}</MarkdownRenderer>
         </div>
+        {time && (
+          <div className="prose text-sm italic w-full max-w-full text-right text-base-content/50">
+            {time}
+          </div>
+        )}
       </div>
     </div>
   );
