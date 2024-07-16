@@ -229,7 +229,7 @@ function ModelInfos({ model }: { model: string }) {
                         onChange={(e) => setSystemPrompt(e.target.value)}
                         onKeyDown={(e) => {
                           {
-                            if (e.which == 13) {
+                            if (e.key == "Enter") {
                               e.preventDefault();
                               e.stopPropagation();
                               sendSystemPrompt();
