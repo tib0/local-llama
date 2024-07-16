@@ -21,6 +21,11 @@ const ChatForm = () => {
   const [loadingPrompt, setLoadingPrompt] = useState<boolean>(false);
   const [loadingModel, setLoadingModel] = useState<boolean>(false);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
+  const [currentHistoryPromptIndex, setCurrentHistoryPromptIndex] =
+    useState<number>(undefined);
+  const [promptHistory, setPromptHistory] = usePersistentStorageValue<string[] | undefined>(
+    "promptHistory",
+  );
   const [currentModel, setCurrentModel] = usePersistentStorageValue<string | undefined>(
     "currentModel",
   );
@@ -55,6 +60,10 @@ const ChatForm = () => {
       type: "PROMPT_CHAT",
       payload: [{ type: "user", text: prompt }] as ChatHistoryItem[],
     });
+
+    const newPromptHistory = promptHistory ?? [""];
+    if (!newPromptHistory.includes(prompt)) newPromptHistory.push(prompt);
+    setPromptHistory(newPromptHistory);
 
     init();
     setLoadingPrompt(true);
@@ -133,6 +142,12 @@ const ChatForm = () => {
   }
 
   useEffect(() => {
+    console.debug(currentHistoryPromptIndex, "useEffect");
+    if (Number.isInteger(currentHistoryPromptIndex))
+      setPrompt(promptHistory[currentHistoryPromptIndex]);
+  }, [currentHistoryPromptIndex]);
+
+  useEffect(() => {
     setHistory(chatHistory);
   }, [chatHistory]);
 
@@ -161,7 +176,7 @@ const ChatForm = () => {
       className="w-full"
       onKeyDown={(e) => {
         {
-          if (e.which == 13) {
+          if (e.key == "Enter") {
             e.preventDefault();
             e.stopPropagation();
             sendPrompt();
@@ -273,7 +288,32 @@ const ChatForm = () => {
             `}
             rows={2}
             placeholder={`Start typing here, and press enter or click on the button`}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(e) => {
+              setPrompt(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (
+                promptHistory &&
+                promptHistory.length > 0 &&
+                e.altKey &&
+                "|PageUp|PageDown|".includes("|" + e.key + "|")
+              ) {
+                const currentIndex = currentHistoryPromptIndex ?? 0;
+
+                switch (e.key) {
+                  case "PageUp":
+                    setCurrentHistoryPromptIndex(
+                      currentIndex - 1 == -1 ? promptHistory.length - 1 : currentIndex - 1,
+                    );
+                    break;
+                  case "PageDown":
+                    setCurrentHistoryPromptIndex(
+                      currentIndex + 1 > promptHistory.length - 1 ? 0 : currentIndex + 1,
+                    );
+                    break;
+                }
+              }
+            }}
             value={prompt}
             disabled={loadingPrompt || loadingModel}
           />
