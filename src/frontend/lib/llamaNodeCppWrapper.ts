@@ -5,6 +5,7 @@ import {
   type Llama,
 } from "node-llama-cpp";
 import { v4 as uuidv4 } from "uuid";
+import { type MainLogger } from "electron-log";
 
 /**
  * Enum representing different GPU types.
@@ -172,6 +173,7 @@ export class LlamaWrapper {
   private llama: Llama | undefined;
   public systemPrompt: string | undefined;
   public temperature: number | undefined;
+  public logger: MainLogger | undefined;
 
   /**
    * Initializes the wrapper with an ID and sets the status to uninitialized.
@@ -194,10 +196,21 @@ export class LlamaWrapper {
    * @param {string} [payload] - An optional payload for the status update.
    */
   private setStatus(status: LlamaStatusType, payload?: string) {
-    console.log(
-      "\x1b[0m\x1b[1mLlamaWrapper\x1b[0m" + status.ico + "\x1b[0m(" + status.text + ")\x1b[0m",
-      payload && payload != "undefined" ? "" + payload + "\x1b[0m" : "",
-    );
+    const content = "[LlamaWrapper] (" + status.text + ") " + (payload ? payload : "");
+    if (this.logger) {
+      switch (status) {
+        case ready:
+        case uninitialized:
+        case garbage:
+        case generating:
+        case loading:
+          this.logger.silly(content);
+          break;
+        case error:
+          this.logger.error(content);
+          break;
+      }
+    }
     this.status = { status, message: payload };
   }
 
@@ -393,11 +406,8 @@ export class LlamaWrapper {
       });
 
       this.llama.logger = (level, message) => {
-        if (
-          level === this.module.LlamaLogLevel.warn ||
-          level === this.module.LlamaLogLevel.error
-        )
-          console.log(level, message);
+        if (level === this.module.LlamaLogLevel.error) this.logger.error(message);
+        if (level === this.module.LlamaLogLevel.warn) this.logger.warn(message);
       };
 
       this.setStatus(ready);

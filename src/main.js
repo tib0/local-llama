@@ -25,10 +25,9 @@ import { appContextMenu, appMenu, promptSystem, winBounds } from "./backend/appC
 import { initFolder, initSelectedModel, initStoreValue } from "./backend/appHelpers";
 import { mainWindowOptions } from "./backend/appConfig";
 import { splashWindowOptions } from "./backend/appConfig";
+import log from "electron-log/main";
 
 const store = new Store();
-
-let llamaNodeCPP = new LlamaWrapper();
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
 
@@ -50,6 +49,8 @@ const defaultTemperature = 0;
 const historyFileExtension = "lllh";
 const modelFileExtension = "gguf";
 
+const logsFileName = "Local-Llama.log";
+
 const modelsFolderPath = path.join(cache, modelsFolderName);
 const historyFolderPath = path.join(cache, historyFolderName);
 const logsFolderPath = path.join(cache, logsFolderName);
@@ -62,10 +63,19 @@ initSelectedModel(store, modelsFolderPath, seletedModelName, modelFileExtension)
 initStoreValue(store, gpuName, defaultGPU);
 initStoreValue(store, temperatureName, defaultTemperature);
 
+log.transports.file.resolvePathFn = () => {
+  return path.join(logsFolderPath, logsFileName);
+};
+
+let llamaNodeCPP = new LlamaWrapper();
+llamaNodeCPP.logger = log;
+
 const createWindow = () => {
+  log.info("Creating window");
   const mainWindow = new BrowserWindow(mainWindowOptions(__dirname));
   const splash = new BrowserWindow(splashWindowOptions);
 
+  log.info("Applying bounds");
   mainWindow.setBounds(winBounds(store));
 
   // eslint-disable-next-line no-undef
@@ -79,9 +89,11 @@ const createWindow = () => {
     );
   }
 
+  log.info("Loading splash screen");
   splash.loadFile(`splash.html`);
 
   mainWindow.on("close", () => {
+    log.info("About to close window, saving bounds");
     store.set("winBounds", {
       isMaximized: mainWindow.isMaximized(),
       ...mainWindow.getNormalBounds(),
@@ -89,12 +101,14 @@ const createWindow = () => {
   });
 
   app.on("second-instance", (_event, _argv, _cwd) => {
+    log.info("Trying to start second instance");
     if (mainWindow) {
       if (mainWindow.isMinimized()) mainWindow.restore();
       mainWindow.focus();
     }
   });
 
+  log.info("Applying context menu");
   mainWindow.webContents.on("context-menu", (_event, params) => {
     appContextMenu(params, mainWindow);
   });
@@ -102,9 +116,13 @@ const createWindow = () => {
   function showWindow() {
     mainWindow.once("ready-to-show", () => {
       setTimeout(async function () {
+        log.info("Loading model");
         await loadModel();
+        log.info("Applying stored temperature");
         llamaNodeCPP.temperature = store.get(temperatureName);
+        log.info("Remove splash screen");
         splash.destroy();
+        log.info("Window ready to be shown");
         mainWindow.show();
       }, 3000);
     });
@@ -118,19 +136,26 @@ const createWindow = () => {
 app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
+  log.info("Window closed");
+  log.info("Disposing model and session");
   llamaNodeCPP.disposeModel();
   llamaNodeCPP.disposeSession();
   llamaNodeCPP = undefined;
+  log.info("Quit");
   app.quit();
 });
 
 app.on("activate", () => {
+  log.info("Activation of window");
   if (BrowserWindow.getAllWindows().length === 0) {
+    log.info("No window found, about to create a new one");
     createWindow();
   }
 });
 
 app.whenReady().then(() => {
+  log.info("App is ready");
+  log.info("Attach app:// protocol");
   protocol.handle("app", (req) => {
     const { pathname } = new URL(req.url);
     return net.fetch(pathToFileURL(pathname).toString());
@@ -164,21 +189,26 @@ ipcMain.on("open-external-link", openExternalLink);
 ipcMain.on("clipboard-copy", clipboardCopy);
 
 async function clipboardCopy(_event, content) {
+  log.info("Copy to clipboard triggered");
   clipboard.writeText(content, "clipboard");
 }
 
 async function openExternalLink(_event, href) {
+  log.info("External link opened");
   shell.openExternal(href);
 }
 
 async function loadModel(_event, modelPath) {
+  log.info("Loading a model");
   const selectedModelPath = modelPath ?? store.get(seletedModelName);
 
   if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
+    log.info("No model path found. Aborting model load");
     return "";
   }
 
   if (!llamaNodeCPP.isReady()) {
+    log.info("LlamaNodeCPP not ready, about to load a new instance");
     await llamaNodeCPP.loadModule();
     await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
@@ -189,10 +219,14 @@ async function loadModel(_event, modelPath) {
     selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename) &&
     store.get(gpuName) === (await llamaNodeCPP.getInfos()).model?.gpu
   ) {
+    log.info("Selected model is allready running with same parameters");
     return selectedModelPath;
   }
 
   if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
+    log.info(
+      "Llama node cpp allready running, about to dispose model and session before reloading.",
+    );
     llamaNodeCPP.clearHistory();
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeSession();
@@ -200,8 +234,11 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
   await llamaNodeCPP.loadModel(selectedModelPath);
+  log.info("New model loaded");
   await llamaNodeCPP.initSession(store.get(systemPromptName) ?? promptSystem);
+  log.info("New session initialized");
 
+  log.info("Broadcast model changed event to each window");
   for (const window of BrowserWindow.getAllWindows()) {
     window.webContents.send("model-changed", selectedModelPath);
   }
@@ -209,14 +246,19 @@ async function loadModel(_event, modelPath) {
   store.set(seletedModelName, selectedModelPath ?? "");
 
   if (llamaNodeCPP.isReady()) {
+    log.info("Llama node cpp is ready after loading the model");
     return selectedModelPath;
   } else {
+    log.warn(
+      "Llama node cpp was not initialized correctly, about to reset default GPU usage.",
+    );
     store.set(gpuName, defaultGPU);
     return "";
   }
 }
 
 async function saveHistory(_event) {
+  log.info("Saving history");
   const date = new Date();
   const defaultFileName = `${date.toISOString().replaceAll(":", "-")}.${historyFileExtension}`;
   const result = await dialog.showSaveDialog({
@@ -230,9 +272,13 @@ async function saveHistory(_event) {
     ],
   });
 
-  if (!result || result.canceled) return "";
+  if (!result || result.canceled) {
+    log.warn("Aborted or unknown file while dialog was shown");
+    return "";
+  }
 
   try {
+    log.info("Retrieving history");
     const history = await llamaNodeCPP.getHistory();
     const conversation = {
       history: history,
@@ -242,8 +288,9 @@ async function saveHistory(_event) {
       temperature: store.get(temperatureName),
     };
     fs.writeFileSync(result.filePath, JSON.stringify(conversation), "utf-8");
+    log.info("History saved");
   } catch (e) {
-    console.log(e, result);
+    log.error(e, result);
     return "";
   }
 
@@ -251,6 +298,7 @@ async function saveHistory(_event) {
 }
 
 async function loadHistory(_event) {
+  log.info("Loading history");
   let historyParm;
   const result = await dialog.showOpenDialog({
     filters: [
@@ -263,15 +311,21 @@ async function loadHistory(_event) {
     defaultPath: store.get(historyFolderName),
     properties: ["openFile"],
   });
-  if (!result || result.canceled) return;
+  if (!result || result.canceled) {
+    log.warn("Aborted or unknown file while dialog was shown");
+    return;
+  }
   try {
+    log.info("Parsing history file");
     historyParm = JSON.parse(fs.readFileSync(result.filePaths[0], "utf-8"));
     store.set(seletedModelName, historyParm.model_path ?? "");
     store.set(systemPromptName, historyParm.prompt_system ?? "");
     store.set(gpuName, historyParm.gpu ?? defaultGPU);
     store.set(temperatureName, historyParm.temperature ?? defaultGPU);
 
+    log.info("Clearing node llama cpp history");
     llamaNodeCPP.clearHistory();
+    log.info("Disposing model and session");
     await llamaNodeCPP.disposeSession();
     await llamaNodeCPP.disposeModel();
     await llamaNodeCPP.disposeLlama();
@@ -279,16 +333,19 @@ async function loadHistory(_event) {
     await loadModel();
     await llamaNodeCPP.setHistory(historyParm.history);
     llamaNodeCPP.temperature = store.get(temperatureName);
+    log.info("History updated");
     return historyParm.history;
   } catch (e) {
-    console.error(e, result);
+    log.error(e, result);
     return;
   }
 }
 
 async function changeModelGpuUse(_event, gpuUse) {
+  log.info("Update GPU use");
   store.set(gpuName, gpuUse);
   llamaNodeCPP.clearHistory();
+  log.info("Reload model and session");
   await llamaNodeCPP.disposeSession();
   await llamaNodeCPP.disposeModel();
   await llamaNodeCPP.disposeLlama();
@@ -296,8 +353,10 @@ async function changeModelGpuUse(_event, gpuUse) {
 }
 
 async function changeModelSystemPrompt(_event, promptSystem) {
+  log.info("Updating system prompt");
   store.set(systemPromptName, promptSystem);
   llamaNodeCPP.clearHistory();
+  log.info("Reload model and session");
   await llamaNodeCPP.disposeSession();
   await llamaNodeCPP.disposeModel();
   await llamaNodeCPP.disposeLlama();
@@ -305,14 +364,17 @@ async function changeModelSystemPrompt(_event, promptSystem) {
 }
 
 async function changeTemperature(_event, temperature) {
+  log.info("Updating temperature");
   store.set(temperatureName, temperature);
 }
 
 async function quitApp(_event) {
+  log.info("Quit app");
   app.quit();
 }
 
 async function clearHistory() {
+  log.info("Clearing history");
   if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
     llamaNodeCPP.clearHistory();
   }
@@ -324,23 +386,32 @@ async function getModelInfo() {
 }
 
 async function chat(_event, userMessage) {
+  log.info("Prompting to chat");
   if (!llamaNodeCPP.isReady()) {
+    log.warn("Llama node cpp is not ready, abort");
     return "Something went wrong. Try to choose another model or restart the application ";
   }
   const temp = store.get(temperatureName);
-  const c = await llamaNodeCPP.prompt(userMessage, undefined, {
-    temperature: temp,
-  });
+  let c = "";
+  try {
+    c = await llamaNodeCPP.prompt(userMessage, undefined, {
+      temperature: temp,
+    });
+  } catch (error) {
+    log.error(error);
+  }
   return c ?? "Something went wrong. Try to choose another model or restart the application ";
 }
 
 async function changeModel() {
+  log.info("Updating the model");
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: [modelFileExtension] }],
     defaultPath: store.get(modelsFolderName),
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
+    log.info("Selected model not found or unknown");
     for (const window of BrowserWindow.getAllWindows()) {
       window.webContents.send("model-changed", store.get(seletedModelName) ?? "");
     }

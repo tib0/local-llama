@@ -33,7 +33,7 @@
 
 ## Summary
 
-- [💻 Installation](#installation)
+- [💻 Install](#install)
 - [📸 Screenshots](#screenshots)
 - [🔧 Settings](#settings)
 - [❔️ How it Works](#how-it-works)
@@ -41,7 +41,7 @@
 - [👨‍💼 Dependencies](#dependencies)
 - [📜 License](#license)
 
-## Installation
+## Install
 
 ### Find a gguf model
 
@@ -207,6 +207,56 @@ your machine.
 
 The app interacts with the llama-node-cpp library, which encapsulates the Llama 3 model within
 a node.js module, ensuring smooth compatibility with both Electron and native code.
+
+### File stored locally
+
+Upon launching the application, a folder structure is created to store history, models, and
+logs. This folder is located under your current user folder, which is represented by
+`%USERPROFILE%` in Windows and `~` in MacOS/Linux.
+
+The folder structure is organized as follows:
+
+    .
+    ├── ...
+    ├── .cache
+    │   ├── ...
+    │   ├── local-llama
+    │   │   ├── logs
+    │   │   │   └── Local-Llama.log
+    │   │   ├── history
+    │   │   │   └── 2024-02-31T19-42-42.042Z.lllh
+    │   │   ├── models
+    │   │   │   └── llama.gguf
+    │   │   └── ...
+    │   └── ...
+    └── ...
+
+### Uninstall
+
+Find below the steps to unistall Local Llama from your computer.
+
+<details>
+  <summary>
+    Mac OS
+  </summary>
+
+1. Delete `Local Llama.app`
+2. Remove the folder located here `~/.cache/local-llama`, it contains log, history and model
+folder.
+</details>
+
+</br>
+
+<details>
+  <summary>
+    Windows
+  </summary>
+
+1. Go to Settings > Applications > Uninstall, click on uninstall on "Local Llama".
+2. Remove the folder located here `%USERPROFILE%\appData\Roaming\"Local Llama"`
+3. Remove the folder located here `%USERPROFILE%\appData\local\LocalLlamaChatApp`
+4. Remove the folder located here `%USERPROFILE%\.cache\local-llama`.
+</details>
 
 ## Use from source
 
