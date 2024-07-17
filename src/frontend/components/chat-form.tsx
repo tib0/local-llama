@@ -125,13 +125,13 @@ const ChatForm = () => {
 
   async function handleSaveHistory() {
     const res = await window.electronAPI.saveHistory();
-    if (res === "") console.log("Save history failed");
+    if (res === "") console.warn("Save history failed");
   }
 
   async function handleLoadHistory() {
     const res = await window.electronAPI.loadHistory();
     if (!res || res === "") {
-      console.log("Load history failed");
+      console.warn("Load history failed");
       return;
     }
     const histArray = Object.keys(res).map((key) => res[key]);
@@ -142,7 +142,6 @@ const ChatForm = () => {
   }
 
   useEffect(() => {
-    console.debug(currentHistoryPromptIndex, "useEffect");
     if (Number.isInteger(currentHistoryPromptIndex))
       setPrompt(promptHistory[currentHistoryPromptIndex]);
   }, [currentHistoryPromptIndex]);
