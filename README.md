@@ -254,7 +254,7 @@ folder.
 
 1. Go to Settings > Applications > Uninstall, click on uninstall on "Local Llama".
 2. Remove the folder located here `%USERPROFILE%\appData\Roaming\"Local Llama"`
-3. Remove the folder located here `%USERPROFILE%\appData\local\LocalLlamaChatApp`
+3. Remove the folder located here `%USERPROFILE%\appData\Local\LocalLlamaChatApp`
 4. Remove the folder located here `%USERPROFILE%\.cache\local-llama`.
 </details>
 
