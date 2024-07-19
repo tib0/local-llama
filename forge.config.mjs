@@ -21,6 +21,20 @@ export default {
       },
     },
     {
+      name: "@electron-forge/maker-wix",
+      config: {
+        language: 1033,
+        manufacturer: "Tib0",
+        description: "Local Llama is an electron app that runs Llama 3 models locally",
+        icon: "./static/icon.ico",
+        name: "Local Llama",
+        shortcutFolderName: "Local-Llama",
+        ui: {
+          chooseDirectory: true,
+        },
+      },
+    },
+    {
       name: "@electron-forge/maker-zip",
       platforms: ["darwin"],
       config: {
