@@ -1,11 +1,5 @@
-import { app } from "electron";
-import { handleSquirrelEvent } from "./backend/windowsSquirelInstallEvent";
-
-if (handleSquirrelEvent() || !app.requestSingleInstanceLock()) {
-  app.quit();
-}
-
 import {
+  app,
   BrowserWindow,
   Menu,
   clipboard,
@@ -15,16 +9,27 @@ import {
   protocol,
   shell,
 } from "electron";
+import { handleSquirrelEvent } from "./backend/windowsSquirelInstallEvent";
+
+if (handleSquirrelEvent() || !app.requestSingleInstanceLock()) {
+  app.quit();
+}
+
 import fs from "fs";
 import os from "os";
 import path from "path";
 import Store from "electron-store";
 import { fileURLToPath, pathToFileURL } from "url";
 import { LlamaWrapper } from "./frontend/lib/llamaNodeCppWrapper";
-import { appContextMenu, appMenu, promptSystem, winBounds } from "./backend/appConfig";
+import {
+  appContextMenu,
+  appMenu,
+  promptSystem,
+  winBounds,
+  mainWindowOptions,
+  splashWindowOptions,
+} from "./backend/appConfig";
 import { initFolder, initSelectedModel, initStoreValue } from "./backend/appHelpers";
-import { mainWindowOptions } from "./backend/appConfig";
-import { splashWindowOptions } from "./backend/appConfig";
 import log from "electron-log/main";
 
 const store = new Store();
@@ -75,6 +80,13 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow(mainWindowOptions(__dirname));
   const splash = new BrowserWindow(splashWindowOptions);
 
+  log.info("Applying preload error handler");
+  mainWindow.webContents.on("preload-error", (_event, preloadPath, error) => {
+    log.error("Preload error");
+    log.error(preloadPath);
+    log.error(error.name + " - " + error.message);
+  });
+
   log.info("Applying bounds");
   mainWindow.setBounds(winBounds(store));
 
@@ -88,6 +100,15 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
+
+  log.info("Applying load error handler");
+  mainWindow.webContents.on(
+    "did-fail-load",
+    (_event, _errorCode, errorDescription, validatedURL) => {
+      log.error("Failed load error");
+      log.error(errorDescription + " - " + validatedURL);
+    },
+  );
 
   log.info("Loading splash screen");
   splash.loadFile(`splash.html`);
@@ -151,6 +172,37 @@ app.on("activate", () => {
     log.info("No window found, about to create a new one");
     createWindow();
   }
+});
+
+process.on("unhandledRejection", function (e) {
+  log.error(`unhandledRejection`);
+  log.error(`${e.name} - ${e.message}`);
+  log.error(`${e.stack}`);
+});
+
+process.on("uncaughtException", function (e) {
+  log.error(`uncaughtException`);
+  log.error(`${e.name} - ${e.message}`);
+  log.error(`${e.stack}`);
+});
+
+app.on("unhandledRejection", function (e) {
+  log.error(`app unhandledRejection`);
+  log.error(`${e.name} - ${e.message}`);
+  log.error(`${e.stack}`);
+});
+
+app.on("uncaughtException", function (e) {
+  log.error(`app uncaughtException`);
+  log.error(`${e.name} - ${e.message}`);
+  log.error(`${e.stack}`);
+});
+
+ipcMain.removeAllListeners("ELECTRON_BROWSER_WINDOW_ALERT");
+ipcMain.on("ELECTRON_BROWSER_WINDOW_ALERT", (event, message, title) => {
+  log.error(`ELECTRON_BROWSER_WINDOW_ALERT`);
+  log.error(`${title} - ${message}`);
+  event.returnValue = 0;
 });
 
 app.whenReady().then(() => {
