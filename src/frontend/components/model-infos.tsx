@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import debounce from "lodash.debounce";
 import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
-import { MicIcon } from "../lib/icons";
+import { MicIcon, WarningIcon } from "../lib/icons";
 import { ChatContext } from "../providers/chat";
 import images from "../lib/images";
 import { titleCase } from "../lib/text";
@@ -124,9 +124,12 @@ function ModelInfos({ model }: { model: string }) {
         />
         <div className="collapse-title px-4 md:pr-8">
           <div className="flex items-center justify-between">
-            <p className="text-lg text-left font-bold text-primary">{modelName}</p>
+            <div className="text-lg font-bold text-primary flex items-center gap-1 justify-between">
+              {modelName + " "}
+              {modelInfo && modelInfo?.status?.warning && <WarningIcon />}
+            </div>
 
-            <div className="text-lg text-right font-bold text-primary -rotate-90">
+            <div className="text-lg text-right items-center justify-center font-bold text-primary flex">
               {modelInfo && modelInfo.status.label && (
                 <div
                   className={`
@@ -163,7 +166,6 @@ function ModelInfos({ model }: { model: string }) {
             <>
               <p className="text-base font-normal text-base-content/90">{"File location:"}</p>
               <p className="text-base font-light text-base-content/70">{model}</p>
-
               {modelInfo &&
                 modelInfo.llama &&
                 typeof modelInfo.llama.temperature === "number" &&
@@ -183,6 +185,23 @@ function ModelInfos({ model }: { model: string }) {
                     </div>
                   </div>
                 )}
+              {modelInfo && modelInfo.status && modelInfo?.status?.warning && (
+                <div className="flex flex-col bg-warning/20 bg-opacity-30 backdrop-blur-lg w-full border-warning/40 bordered border-2 shadow-md rounded-xl p-2 mt-4">
+                  <div className="w-full">
+                    <span className="text-base font-normal text-base-content flex justify-start items-center gap-1">
+                      <WarningIcon strokeColor="oklch(var(--bc))" />
+                      Warning:
+                    </span>
+                    <span
+                      className={`
+                            text-base font-light text-base-content/90
+                          `}
+                    >
+                      {" " + modelInfo.status.warning}
+                    </span>
+                  </div>
+                </div>
+              )}
               <div className="collapse mt-4 bg-base-100/20 bg-opacity-50 backdrop-blur-lg w-full border-base-300/30 bordered border-2 shadow-md rounded-xl">
                 <input type="checkbox" tabIndex={-1} />
                 <div className="collapse-title text-xl font-extrabold">

@@ -21,6 +21,7 @@ const loading = { text: "loading", ico: "📔" };
 const garbage = { text: "garbage", ico: "📘" };
 const generating = { text: "generating", ico: "📙" };
 const error = { text: "error", ico: "📕" };
+const warning = { text: "warning", ico: "📕" };
 
 /**
  * Enum representing the status of a llama node.
@@ -66,6 +67,10 @@ export interface LlamaCppInfo {
      * Message related to status
      */
     message?: string;
+    /**
+     * Warning message
+     */
+    warning?: string;
   };
 
   /**
@@ -174,6 +179,7 @@ export class LlamaWrapper {
   public systemPrompt: string | undefined;
   public temperature: number | undefined;
   public logger: MainLogger | undefined;
+  public warning: string | undefined;
 
   /**
    * Initializes the wrapper with an ID and sets the status to uninitialized.
@@ -205,6 +211,10 @@ export class LlamaWrapper {
         case generating:
         case loading:
           this.logger.silly(content);
+          break;
+        case warning:
+          this.logger.silly(content);
+          this.warning = payload;
           break;
         case error:
           this.logger.error(content);
@@ -262,6 +272,7 @@ export class LlamaWrapper {
         status: {
           label: this.status.status.text,
           message: this.status.message || "",
+          warning: this.warning || "",
         },
       };
     }
@@ -343,6 +354,7 @@ export class LlamaWrapper {
       this.setStatus(error, String("disposeLlama: No llama found."));
       return;
     }
+    this.warning = undefined;
     this.llama = undefined;
     this.setStatus(garbage, String("Llama disposed."));
   }
@@ -399,18 +411,19 @@ export class LlamaWrapper {
       this.setStatus(loading, `Loading Llama lib`);
 
       this.llama = await this.module.getLlama({
-        logLevel: this.module.LlamaLogLevel.warn,
         build: "never",
         progressLogs: false,
         gpu: gpu ?? "auto",
       });
 
       this.llama.logger = (level, message) => {
-        if (level === this.module.LlamaLogLevel.error) this.logger.error(message);
-        if (level === this.module.LlamaLogLevel.warn) this.logger.warn(message);
+        if (level === this.module.LlamaLogLevel.error) {
+          this.setStatus(error, message);
+        }
+        if (level === this.module.LlamaLogLevel.warn) {
+          this.setStatus(warning, message);
+        }
       };
-
-      this.setStatus(ready);
     } catch (err) {
       this.setStatus(error, String("loadLlama: " + err.message));
       return;
@@ -437,6 +450,8 @@ export class LlamaWrapper {
       this.setStatus(error, String("loadModel: No llama lib loaded."));
       return;
     }
+
+    this.warning = undefined;
 
     try {
       this.setStatus(loading, `Loading model from ${modelPath}`);
