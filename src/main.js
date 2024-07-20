@@ -34,7 +34,7 @@ import log from "electron-log/main";
 
 const store = new Store();
 
-protocol.registerSchemesAsPrivileged([{ scheme: "app", privileges: { bypassCSP: true } }]);
+protocol.registerSchemesAsPrivileged([{ scheme: "app" }]);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
