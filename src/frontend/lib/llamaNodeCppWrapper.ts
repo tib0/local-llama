@@ -168,17 +168,17 @@ async function llamaModule(): Promise<typeof import("node-llama-cpp")> {
  * @class
  */
 export class LlamaWrapper {
+  private abortController: AbortController | undefined;
   private id: string;
+  private llama: Llama | undefined;
+  private model: LlamaModel | undefined;
+  private module: typeof import("node-llama-cpp") | undefined;
   private session: LlamaChatSession | undefined;
   private status: LlamaStatus | undefined;
-  private model: LlamaModel | undefined;
-  private errorCallback: () => void;
-  private abortController: AbortController;
-  private module: typeof import("node-llama-cpp") | undefined;
-  private llama: Llama | undefined;
+  public errorCallback: () => void;
+  public logger: MainLogger | undefined;
   public systemPrompt: string | undefined;
   public temperature: number | undefined;
-  public logger: MainLogger | undefined;
   public warning: string | undefined;
 
   /**
@@ -189,9 +189,9 @@ export class LlamaWrapper {
   constructor() {
     this.setStatus(uninitialized, "Wrapper not initialized");
     this.id = uuidv4();
-    this.abortController = new AbortController();
+    this.abortController = undefined;
     this.errorCallback = () => {
-      this.abortController.abort();
+      if (this.abortController) this.abortController.abort();
     };
   }
 
@@ -530,6 +530,8 @@ export class LlamaWrapper {
 
     this.setStatus(generating);
 
+    this.abortController = new AbortController();
+
     try {
       const answer = await this.session.prompt(message, {
         onToken: (chunk) => {
@@ -539,12 +541,15 @@ export class LlamaWrapper {
           }
         },
         signal: this.abortController.signal,
+        stopOnAbortSignal: true,
         ...options,
       });
       this.temperature = options.temperature;
+      this.abortController = undefined;
       this.setStatus(ready);
       return answer;
     } catch (err) {
+      this.abortController = undefined;
       this.errorCallback();
       this.setStatus(error, String("prompt: " + err.message));
       return;

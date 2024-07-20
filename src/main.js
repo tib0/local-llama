@@ -226,6 +226,8 @@ ipcMain.handle("model-load-history", loadHistory);
 
 ipcMain.handle("quit-app", quitApp);
 
+ipcMain.on("abort-prompt", abortPrompt);
+
 ipcMain.on("model-change", changeModel);
 
 ipcMain.on("model-change-gpu-use", changeModelGpuUse);
@@ -430,6 +432,11 @@ async function clearHistory() {
   if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
     llamaNodeCPP.clearHistory();
   }
+}
+
+async function abortPrompt() {
+  log.info("Aborting prompt");
+  llamaNodeCPP.errorCallback();
 }
 
 async function getModelInfo() {

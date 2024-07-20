@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("electronAPI", {
+  abortPrompt: () => ipcRenderer.send("abort-prompt"),
   changeModel: () => ipcRenderer.send("model-change"),
   changeModelGpuUse: (useGpu) => ipcRenderer.send("model-change-gpu-use", useGpu),
   changeModelSystemPrompt: (systemPrompt) =>

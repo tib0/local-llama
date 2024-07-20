@@ -91,6 +91,10 @@ const ChatForm = () => {
     window.electronAPI.clearHistory();
   }
 
+  async function abortPrompt() {
+    await window.electronAPI.abortPrompt();
+  }
+
   async function changeModel() {
     setLoadingModel(true);
     setLastModel(currentModel);
@@ -238,10 +242,14 @@ const ChatForm = () => {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (loadingPrompt) {
+                abortPrompt();
+              } else {
               clearHistory();
+              }
             }}
           >
-            Clear
+            {loadingPrompt ? "Stop" : "Clear"}
           </button>
           <button
             type="button"

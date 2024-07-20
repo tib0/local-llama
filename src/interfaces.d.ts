@@ -13,6 +13,7 @@ declare global {
 }
 
 export interface IElectronAPI {
+  abortPrompt: () => Promise<void>;
   changeModel: () => Promise<string>;
   changeModelGpuUse: (g: string) => Promise<void>;
   changeModelSystemPrompt: (p: string) => Promise<void>;
