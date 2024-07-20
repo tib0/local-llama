@@ -5,7 +5,9 @@ const ChatBubbleSkeleton = ({ text }: { text: string }) => (
     key={`model-chat-skel`}
     className={`
     hover:cursor-wait
-    card my-1 sm:my-2 py-2 px-4 w-full max-w-[90%] self-start 
+    card my-1 sm:my-2 py-2 px-4
+    ${text && text !== "" ? "w-max" : "w-full"}
+    max-w-[90%] self-start 
     text-base-content border border-secondary/30 
     bg-base-100/70 backdrop-blur-lg shadow-md
     `}
