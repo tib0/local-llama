@@ -30,7 +30,7 @@ const ChatBubbleModel = ({ index, text }: { index: string; text: string }) => {
         </div>
       </div>
       <div className="card-body p-0 text-left">
-        <div className="prose prose-pre:bg-[#1E1E1E] prose-p:text-base prose-span:text-base w-full max-w-full ">
+        <div className="prose prose-pre:bg-[#1E1E1E] prose-p:text-base prose-span:text-base w-full max-w-full">
           <MarkdownRenderer>{content}</MarkdownRenderer>
         </div>
         {time && (

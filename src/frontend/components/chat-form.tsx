@@ -19,6 +19,8 @@ const ChatForm = () => {
   });
   const [prompt, setPrompt] = useState<string>("");
   const [loadingPrompt, setLoadingPrompt] = useState<boolean>(false);
+  const [loadedChunk, setLoadedChunk] = useState<string>("");
+  const [loadedPromptChunks, setLoadedPromptChunks] = useState<string>("");
   const [loadingModel, setLoadingModel] = useState<boolean>(false);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
   const [currentHistoryPromptIndex, setCurrentHistoryPromptIndex] =
@@ -79,6 +81,8 @@ const ChatForm = () => {
             { type: "model", response: [response + "\n\n" + elapsed] },
           ] as ChatHistoryItem[],
         });
+        setLoadedPromptChunks("");
+        setLoadedChunk("");
       }
     });
     setLoadingPrompt(false);
@@ -155,6 +159,12 @@ const ChatForm = () => {
   }, [chatHistory]);
 
   useEffect(() => {
+    setLoadedPromptChunks(
+      loadedPromptChunks + loadedChunk
+    );
+  }, [loadedChunk]);
+
+  useEffect(() => {
     if (!loadingPrompt) inputRef.current?.focus();
   }, [loadingPrompt]);
 
@@ -169,6 +179,12 @@ const ChatForm = () => {
         type: "CLEAR_HISTORY",
       });
       setLoadingModel(false);
+    });
+    window.electronAPI.onChunkReceive((newChunk) => {
+      if (!newChunk) {
+        return;
+      }
+      setLoadedChunk(newChunk);
     });
   }, []);
 
@@ -245,7 +261,7 @@ const ChatForm = () => {
               if (loadingPrompt) {
                 abortPrompt();
               } else {
-              clearHistory();
+                clearHistory();
               }
             }}
           >
@@ -356,7 +372,7 @@ const ChatForm = () => {
             </button>
           </div>
         </label>
-        {loadingPrompt && <ChatBubbleSkeleton />}
+        {loadingPrompt && <ChatBubbleSkeleton text={loadedPromptChunks} />}
         {history.toReversed().map((c: ChatHistoryItem, index) => {
           switch (c.type) {
             case "model":

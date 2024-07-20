@@ -451,9 +451,16 @@ async function chat(_event, userMessage) {
     return "Something went wrong. Try to choose another model or restart the application ";
   }
   const temp = store.get(temperatureName);
+
+  const streamCallback = (c) => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("chunk-received", c);
+    }
+  };
+
   let c = "";
   try {
-    c = await llamaNodeCPP.prompt(userMessage, undefined, {
+    c = await llamaNodeCPP.prompt(userMessage, streamCallback, {
       temperature: temp,
     });
   } catch (error) {

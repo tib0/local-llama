@@ -1,4 +1,6 @@
-const ChatBubbleSkeleton = () => (
+import MarkdownRenderer from "../markdown";
+
+const ChatBubbleSkeleton = ({ text }: { text: string }) => (
   <div
     key={`model-chat-skel`}
     className={`
@@ -12,10 +14,16 @@ const ChatBubbleSkeleton = () => (
       <div className="prose">{"Model :"}</div>
     </div>
     <div className="card-body p-0 text-left">
-      <div className="prose w-full max-w-full">
-        <div className="skeleton h-3 mb-1 w-full"></div>
-        <div className="skeleton h-3 mb-1 w-full"></div>
-        <div className="skeleton h-3 mb-1 w-3/4"></div>
+      <div className="prose prose-pre:bg-[#1E1E1E] prose-p:text-base prose-span:text-base w-full max-w-full">
+        {text ? (
+          <MarkdownRenderer>{text}</MarkdownRenderer>
+        ) : (
+          <>
+            <div className="skeleton h-3 mb-1 w-full"></div>
+            <div className="skeleton h-3 mb-1 w-full"></div>
+            <div className="skeleton h-3 mb-1 w-3/4"></div>
+          </>
+        )}
       </div>
     </div>
   </div>
