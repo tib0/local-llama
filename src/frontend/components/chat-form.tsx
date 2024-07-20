@@ -323,12 +323,12 @@ const ChatForm = () => {
                 const currentIndex = currentHistoryPromptIndex ?? 0;
 
                 switch (e.key) {
-                  case "PageUp":
+                  case "PageDown":
                     setCurrentHistoryPromptIndex(
                       currentIndex - 1 == -1 ? promptHistory.length - 1 : currentIndex - 1,
                     );
                     break;
-                  case "PageDown":
+                  case "PageUp":
                     setCurrentHistoryPromptIndex(
                       currentIndex + 1 > promptHistory.length - 1 ? 0 : currentIndex + 1,
                     );
