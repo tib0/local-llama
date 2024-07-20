@@ -8,6 +8,7 @@ import { ChatContext } from "../providers/chat";
 import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
 import ModelInfos from "./model-infos";
 import ChatBubbleModel from "./chat-form/chat-bubble-model";
+import { isMac } from "../lib/os";
 
 type ObjectWithStrings = {
   [index: string]: any[];
@@ -159,9 +160,7 @@ const ChatForm = () => {
   }, [chatHistory]);
 
   useEffect(() => {
-    setLoadedPromptChunks(
-      loadedPromptChunks + loadedChunk
-    );
+    setLoadedPromptChunks(loadedPromptChunks + loadedChunk);
   }, [loadedChunk]);
 
   useEffect(() => {
@@ -231,9 +230,9 @@ const ChatForm = () => {
               defaultValue="auto"
             >
               <option value={"auto"}>Auto</option>
-              <option value={"metal"}>Use Metal</option>
+              {isMac() && <option value={"metal"}>Use Metal</option>}
+              {!isMac() && <option value={"vulkan"}>Use Vulkan</option>}
               <option value={"cuda"}>Use Cuda</option>
-              <option value={"vulkan"}>Use Vulkan</option>
               <option value={"false"}>No GPU</option>
             </select>
           </div>
