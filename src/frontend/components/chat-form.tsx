@@ -93,11 +93,15 @@ const ChatForm = () => {
     dispatch({
       type: "CLEAR_HISTORY",
     });
+    setLoadedPromptChunks("");
+    setLoadedChunk("");
     window.electronAPI.clearHistory();
   }
 
   async function abortPrompt() {
     await window.electronAPI.abortPrompt();
+    setLoadedPromptChunks("");
+    setLoadedChunk("");
   }
 
   async function changeModel() {
@@ -160,7 +164,8 @@ const ChatForm = () => {
   }, [chatHistory]);
 
   useEffect(() => {
-    setLoadedPromptChunks(loadedPromptChunks + loadedChunk);
+    if (loadedChunk && loadedChunk !== "")
+      setLoadedPromptChunks(loadedPromptChunks + loadedChunk);
   }, [loadedChunk]);
 
   useEffect(() => {
