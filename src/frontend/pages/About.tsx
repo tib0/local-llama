@@ -9,51 +9,77 @@ function About(): JSX.Element {
       <React.Fragment>
         <div className={`min-h-[calc(100vh-5rem)] text-center`}>
           <div className="flex justify-center">
-            <img className="max-w-64 pt-8" src={images.logo} />
+            <img className="max-w-64 pt-4" src={images.logo} />
           </div>
           <div>
-            <div className="py-2">
-              <p>This recreational project aim to help you run LLM models locally 🚀</p>
-              <p>
-                With local llama you can safely use Llama 3 models without needing to register
+            <div>
+              <p className="font-medium">
+                This recreational project aim to help you run LLM models locally 🚀
+              </p>
+              <p className="font-medium">
+                With local llama, you can safely use Llama 3 models without needing to register
                 to any exernal services.
               </p>
-              <p>
+              <p className="font-medium">
                 {
                   'You will be able to run gguf models. You can find them by searching for "gguf" at '
                 }
-                <a href="https://huggingface.co/models?search=gguf" target="_blank">
+                <a
+                  className="link-primary font-black"
+                  href="https://huggingface.co/models?search=gguf"
+                  target="_blank"
+                >
                   Hugginface.co
                 </a>
               </p>
               <div className="flex flex-col justify-center items-center">
-                <ul className="text-left list-decimal list-inside mx-4 py-2 max-w-lg">
-                  <li>Choose the model you want to run by clicking the "Model..." button.</li>
-                  <li>
-                    Adjust the GPU setting for optimal performance using Vulkan, CUDA, Metal,
+                <ul className="text-left list-none list-inside mx-4 py-2 max-w-lg">
+                  <li className="mt-1">
+                    <span className="font-black text-primary text-xl mr-1">1</span>
+                    {' Choose the model you want to run by clicking the "Model..." button.'}
+                  </li>
+                  <li className="mt-1">
+                    <span className="font-black text-primary text-xl mr-1">2</span>
+                    {
+                      " Adjust the GPU setting for optimal performance using Vulkan, CUDA, Metal,"
+                    }
                     or no GPU at all.
                   </li>
-                  <li>
-                    Regulate the temperature slider to define your desired level (maximum is 2,
-                    minimum is 0).
+                  <li className="mt-1">
+                    <span className="font-black text-primary text-xl mr-1">3</span>
+                    {
+                      " Regulate the temperature slider to define your desired level (maximum is 2, minimum is 0)."
+                    }
                   </li>
-                  <li>Begin conversing!</li>
-                  <li>You can save chat history to track previous discussions.</li>
-                  <li>You can load chat history to continue previous discussions.</li>
+                  <li className="mt-1">
+                    <span className="font-black text-primary text-xl mr-1">4</span>
+                    {" Begin conversing!"}
+                  </li>
+                  <li className="mt-1">
+                    <span className="font-black text-primary text-xl mr-1">5</span>
+                    {" You can save chat history to track previous discussions."}
+                  </li>
+                  <li className="my-1">
+                    <span className="font-black text-primary text-xl mr-1">6</span>
+                    {" You can load chat history to continue previous discussions."}
+                  </li>
                 </ul>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center">
-              <p>
+            <div className="w-full flex items-center justify-center">
+              <div className="p-0 m-4 max-w-[460px] w-7/12 h-0.5 rounded-full shadow-xl bg-primary/50"></div>
+            </div>
+            <div className="flex flex-col justify-center items-center pt-2">
+              <p className="font-medium">
                 This project would not have come to life without the amazing work done by the
-                awsome teams and people :
+                awsome teams and people:
               </p>
-              <ul className="text-left list-none md:list-disc list-inside mx-4 py-2 max-w-lg">
-                <li>
+              <ul className="text-left list-none list-inside mx-4 py-2 max-w-lg">
+                <li className="mt-1">
                   <a
                     href="https://github.com/fozziethebeat/electron-forge-plugin-vite-esm#plugin-vite-esm"
                     target="_blank"
-                    className="font-black text-primary text-xl"
+                    className="font-black text-primary text-xl mr-1"
                   >
                     fozziethebeat
                   </a>
@@ -61,21 +87,21 @@ function About(): JSX.Element {
                     " from SurfaceData team, with plugin-vite-esm he'd tackle down complex integration of node-llama-cpp inside an electron app."
                   }
                 </li>
-                <li>
+                <li className="mt-1">
                   <a
                     href="https://github.com/withcatai/node-llama-cpp"
                     target="_blank"
-                    className="font-black text-primary text-xl"
+                    className="font-black text-primary text-xl mr-1"
                   >
                     giladgd
                   </a>
                   {" from withcatai team have integrated llama.cpp to node."}
                 </li>
-                <li>
+                <li className="mt-1">
                   <a
                     href="https://github.com/ggerganov/llama.cpp"
                     target="_blank"
-                    className="font-black text-primary text-xl"
+                    className="font-black text-primary text-xl mr-1"
                   >
                     ggerganov
                   </a>
