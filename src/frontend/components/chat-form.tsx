@@ -103,7 +103,6 @@ const ChatForm = () => {
   async function changeModel() {
     setLoadingModel(true);
     setLastModel(currentModel);
-    setCurrentModel("Loading model, please wait");
     window.electronAPI.changeModel();
   }
 
@@ -287,10 +286,14 @@ const ChatForm = () => {
         </div>
       </div>
       <div className="flex justify-start gap-2 items-center w-full pt-3 pb-1 px-0">
-        {currentModel ? (
+        {loadingModel ? (
+          <div className="text-lg font-bold text-primary">Loading model, please wait...</div>
+        ) : currentModel && currentModel !== "" ? (
           <ModelInfos model={currentModel} />
         ) : (
-          "Missing model, read the instruction if needed"
+          <div className="text-lg font-bold text-primary py-2">
+            Missing model, read the instruction if needed
+          </div>
         )}
       </div>
       <div className="flex flex-col justify-center">
