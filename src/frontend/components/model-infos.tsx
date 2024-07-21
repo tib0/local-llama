@@ -105,10 +105,8 @@ function ModelInfos({ model }: { model: string }) {
   }, [modelInfo?.llama?.temperature, temperature]);
 
   useEffect(() => {
-    setTemperature(
-      !temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50,
-    );
-    defineTempIco(!temperature || isNaN(temperature) ? 0 : modelInfo?.llama?.temperature * 50);
+    setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
+    defineTempIco(modelInfo?.llama?.temperature * 50 ?? 0);
   }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
   return (
