@@ -82,8 +82,6 @@ const ChatForm = () => {
             { type: "model", response: [response + "\n\n" + elapsed] },
           ] as ChatHistoryItem[],
         });
-        setLoadedPromptChunks("");
-        setLoadedChunk("");
       }
     });
     setLoadingPrompt(false);
@@ -93,15 +91,13 @@ const ChatForm = () => {
     dispatch({
       type: "CLEAR_HISTORY",
     });
-    setLoadedPromptChunks("");
-    setLoadedChunk("");
     window.electronAPI.clearHistory();
   }
 
   async function abortPrompt() {
-    await window.electronAPI.abortPrompt();
-    setLoadedPromptChunks("");
     setLoadedChunk("");
+    setLoadedPromptChunks("");
+    await window.electronAPI.abortPrompt();
   }
 
   async function changeModel() {
@@ -164,12 +160,17 @@ const ChatForm = () => {
   }, [chatHistory]);
 
   useEffect(() => {
-    if (loadedChunk && loadedChunk !== "")
+    if (loadedChunk && loadedChunk !== "") {
       setLoadedPromptChunks(loadedPromptChunks + loadedChunk);
+    }
   }, [loadedChunk]);
 
   useEffect(() => {
-    if (!loadingPrompt) inputRef.current?.focus();
+    if (!loadingPrompt) {
+      setLoadedChunk("");
+      setLoadedPromptChunks("");
+      inputRef.current?.focus();
+    }
   }, [loadingPrompt]);
 
   useEffect(() => {
