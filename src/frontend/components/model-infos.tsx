@@ -392,7 +392,7 @@ function ModelInfos({ model }: { model: string }) {
               type="range"
               min={0}
               max="100"
-              value={temperature}
+              value={isNaN(temperature) ? 0 : temperature}
               className="range range-lg range-primary"
               onChange={(e) => {
                 setTemperature(e.target.value as any);
