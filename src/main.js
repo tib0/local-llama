@@ -72,6 +72,14 @@ log.transports.file.resolvePathFn = () => {
   return path.join(logsFolderPath, logsFileName);
 };
 
+if (app.isPackaged) {
+  log.transports.file.level = "info";
+  log.transports.console.level = false;
+} else {
+  log.transports.file.level = "silly";
+  log.transports.console.level = "silly";
+}
+
 let llamaNodeCPP = new LlamaWrapper();
 llamaNodeCPP.logger = log;
 
