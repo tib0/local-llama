@@ -174,37 +174,6 @@ app.on("activate", () => {
   }
 });
 
-process.on("unhandledRejection", function (e) {
-  log.error(`unhandledRejection`);
-  log.error(`${e.name} - ${e.message}`);
-  log.error(`${e.stack}`);
-});
-
-process.on("uncaughtException", function (e) {
-  log.error(`uncaughtException`);
-  log.error(`${e.name} - ${e.message}`);
-  log.error(`${e.stack}`);
-});
-
-app.on("unhandledRejection", function (e) {
-  log.error(`app unhandledRejection`);
-  log.error(`${e.name} - ${e.message}`);
-  log.error(`${e.stack}`);
-});
-
-app.on("uncaughtException", function (e) {
-  log.error(`app uncaughtException`);
-  log.error(`${e.name} - ${e.message}`);
-  log.error(`${e.stack}`);
-});
-
-ipcMain.removeAllListeners("ELECTRON_BROWSER_WINDOW_ALERT");
-ipcMain.on("ELECTRON_BROWSER_WINDOW_ALERT", (event, message, title) => {
-  log.error(`ELECTRON_BROWSER_WINDOW_ALERT`);
-  log.error(`${title} - ${message}`);
-  event.returnValue = 0;
-});
-
 app.whenReady().then(() => {
   log.info("App is ready");
   log.info("Attach app:// protocol");
