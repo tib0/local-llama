@@ -244,19 +244,25 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
 
+  const infos = await llamaNodeCPP.getInfos();
   if (
     llamaNodeCPP.isReady() &&
-    (await llamaNodeCPP.getInfos()).model !== undefined &&
-    selectedModelPath.includes((await llamaNodeCPP.getInfos()).model?.filename) &&
-    store.get(gpuName) === (await llamaNodeCPP.getInfos()).model?.gpu
+    infos.model !== undefined &&
+    selectedModelPath.includes(infos.model?.filename) &&
+    (store.get(gpuName) === infos.llama?.gpu || store.get(gpuName) === "auto")
   ) {
-    log.info("Selected model is allready running with same parameters");
+    log.info(
+      "Selected model is allready running with same parameters, broadcast the information to each window",
+    );
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("model-changed", "");
+    }
     return selectedModelPath;
   }
 
-  if (llamaNodeCPP.isReady() && (await llamaNodeCPP.getInfos()).context !== undefined) {
+  if (llamaNodeCPP.isReady() && infos.context !== undefined) {
     log.info(
-      "Llama node cpp allready running, about to dispose model and session before reloading.",
+      "Llama node cpp allready running, about to dispose model and session before reloading",
     );
     llamaNodeCPP.clearHistory();
     await llamaNodeCPP.disposeModel();
@@ -446,7 +452,7 @@ async function chat(_event, userMessage) {
   return c ?? "Something went wrong. Try to choose another model or restart the application ";
 }
 
-async function changeModel() {
+async function changeModel(event) {
   log.info("Updating the model");
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: [modelFileExtension] }],
@@ -454,11 +460,11 @@ async function changeModel() {
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
-    log.info("Selected model not found or unknown");
+    log.info("Selected model not found or operation canceled");
     for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("model-changed", store.get(seletedModelName) ?? "");
+      window.webContents.send("model-changed", "");
     }
-    return;
+  } else {
+    await loadModel(event, filePaths[0]);
   }
-  await loadModel(undefined, filePaths[0]);
 }

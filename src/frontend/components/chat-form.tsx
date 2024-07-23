@@ -32,7 +32,6 @@ const ChatForm = () => {
   const [currentModel, setCurrentModel] = usePersistentStorageValue<string | undefined>(
     "currentModel",
   );
-  const [lastModel, setLastModel] = useState<string>("");
   const [_currentGpuUse, setCurrentGpuUse] = usePersistentStorageValue<string | undefined>(
     "currentGpuUse",
   );
@@ -91,7 +90,7 @@ const ChatForm = () => {
     dispatch({
       type: "CLEAR_HISTORY",
     });
-    window.electronAPI.clearHistory();
+    await window.electronAPI.clearHistory();
   }
 
   async function abortPrompt() {
@@ -102,8 +101,7 @@ const ChatForm = () => {
 
   async function changeModel() {
     setLoadingModel(true);
-    setLastModel(currentModel);
-    window.electronAPI.changeModel();
+    await window.electronAPI.changeModel();
   }
 
   const handleSelectGpuChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -174,14 +172,12 @@ const ChatForm = () => {
 
   useEffect(() => {
     window.electronAPI.onModelChange((modelPath) => {
-      if (!modelPath) {
-        setCurrentModel(lastModel);
-        return;
+      if (modelPath && modelPath !== "") {
+        setCurrentModel(modelPath);
+        dispatch({
+          type: "CLEAR_HISTORY",
+        });
       }
-      setCurrentModel(modelPath);
-      dispatch({
-        type: "CLEAR_HISTORY",
-      });
       setLoadingModel(false);
     });
     window.electronAPI.onChunkReceive((newChunk) => {
