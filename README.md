@@ -4,7 +4,7 @@
   <img src="./.github/logo_25.webp" />
 </p>
 <p align="center" style="font-size:18px; font-weight:800; margin: 5px;">
-  v0.0.5
+  v0.0.6
 </p>
 <p align="center" style="font-size:18px; font-weight:600; margin-bottom: 10px;">
   Local Llama also known as L³ is designed to be easy to use, with a user-friendly interface and advanced settings.
@@ -55,8 +55,8 @@ model will be compatible with Local Llama.
     M1, M2, M3 processors..
   </summary>
 
-1. Download the latest release from
-   [MacOS.arm.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.5/MacOS.arm.local-llama.zip).
+1. Download the latest MacOS.arm.local-llama.zip file from
+   [here](https://github.com/tib0/local-llama/releases/latest).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -67,8 +67,8 @@ model will be compatible with Local Llama.
     Intel processors... 
   </summary>
 
-1. Download the latest release from
-   [MacOS.x64.local-llama.zip](https://github.com/tib0/local-llama/releases/download/0.0.5/MacOS.x64.local-llama.zip).
+1. Download the latest MacOS.x64.local-llama.zip file from
+   [here](https://github.com/tib0/local-llama/releases/latest).
 2. Uncompress the zip
 3. Run the file `Local Llama.app`.
 </details>
@@ -77,14 +77,27 @@ model will be compatible with Local Llama.
 
 <details>
   <summary>
-    All 
+    Exe installer 
   </summary>
 
-1. Download the latest release from
-   [Windows.local-llama.exe](https://github.com/tib0/local-llama/releases/download/0.0.5/Windows.local-llama.exe).
+1. Download the latest Windows.local-llama.exe file from  
+   [here](https://github.com/tib0/local-llama/releases/latest).
 2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
-   right place.
+   right place (`%USERPROFILE%\appData\Roaming\"Local Llama"` and
+   `%USERPROFILE%\appData\Local\LocalLlamaChatApp`).
 3. Launch the app `Local Llama`.
+</details>
+
+</br>
+<details>
+  <summary>
+    Msi installer 
+  </summary>
+
+1. Build and make the app from sources by looking at [Use from source](#use-from-source)
+   section.
+2. Navigate to the `out` folder within your project's root directory, where you will find the
+generated file.
 </details>
 
 ### Linux
@@ -94,9 +107,9 @@ model will be compatible with Local Llama.
     All
   </summary>
 
-1.  Build and make the app from sources by looking at "Use from source" section. Utilize either
-    the `npm run package` or `npm run make` command.
-2.  Navigate to the `out` folder within your project's root directory, where you will find the
+1. Build and make the app from sources by looking at [Use from source](#use-from-source)
+   section.
+2. Navigate to the `out` folder within your project's root directory, where you will find the
 generated file.
 </details>
 
@@ -148,6 +161,7 @@ generated file.
 - **History...**: This button will open a file browser window, allowing you to choose the
   history file to load. History files are JSON representations of your conversations.
 - **Clear**: This button clear the history and reset the current session.
+- **Stop**: This button will abort the current prompt operation.
 - **Save**: This button is used to save the current session into a file. The file is a JSON
   representation of the conversation. File extension is `.lllh`
 - **Slider**: This slider is used to control the temperature of the next user prompt.
@@ -297,6 +311,10 @@ $ npm run package
 ```bash
 $ npm run make
 ```
+
+For Windows users, creating an MSI installer requires having the Wix Tools installed on your
+local machine. For more information and guidance sees
+[here](https://learn.microsoft.com/en-us/microsoft-edge/webview2/samples/wv2deploymentwixcustomactionsample#step-3---install-wix-toolset-build-tools).
 
 ### Requirements
 
