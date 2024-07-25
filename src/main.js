@@ -234,7 +234,10 @@ async function loadModel(_event, modelPath) {
   const selectedModelPath = modelPath ?? store.get(seletedModelName);
 
   if (!selectedModelPath || !fs.existsSync(selectedModelPath)) {
-    log.info("No model path found. Aborting model load");
+    log.info(
+      "No model path found or file not found. Aborting model load. Model path:",
+      selectedModelPath,
+    );
     return "";
   }
 
@@ -334,7 +337,7 @@ async function saveHistory(_event) {
   return result.filePath;
 }
 
-async function loadHistory(_event) {
+async function loadHistory(event) {
   log.info("Loading history");
   let historyParm;
   const result = await dialog.showOpenDialog({
@@ -349,28 +352,35 @@ async function loadHistory(_event) {
     properties: ["openFile"],
   });
   if (!result || result.canceled) {
-    log.warn("Aborted or unknown file while dialog was shown");
+    log.info("Selected file not found or operation canceled");
     return;
   }
   try {
     log.info("Parsing history file");
     historyParm = JSON.parse(fs.readFileSync(result.filePaths[0], "utf-8"));
-    store.set(seletedModelName, historyParm.model_path ?? "");
     store.set(systemPromptName, historyParm.prompt_system ?? "");
     store.set(gpuName, historyParm.gpu ?? defaultGPU);
     store.set(temperatureName, historyParm.temperature ?? defaultGPU);
+    if (!historyParm.modelPath || !fs.existsSync(historyParm.modelPath)) {
+      log.warn("Model path not found");
+      log.info("Clearing node llama cpp previous history");
+      llamaNodeCPP.clearHistory();
+      await llamaNodeCPP.setHistory(historyParm.history);
+      log.info("History updated without updating model");
+    } else {
+      store.set(seletedModelName, historyParm.model_path ?? "");
+      log.info("Clearing node llama cpp history");
+      llamaNodeCPP.clearHistory();
+      log.info("Disposing model and session");
+      await llamaNodeCPP.disposeSession();
+      await llamaNodeCPP.disposeModel();
+      await llamaNodeCPP.disposeLlama();
 
-    log.info("Clearing node llama cpp history");
-    llamaNodeCPP.clearHistory();
-    log.info("Disposing model and session");
-    await llamaNodeCPP.disposeSession();
-    await llamaNodeCPP.disposeModel();
-    await llamaNodeCPP.disposeLlama();
-
-    await loadModel();
-    await llamaNodeCPP.setHistory(historyParm.history);
+      await loadModel(event, historyParm.model_path);
+      await llamaNodeCPP.setHistory(historyParm.history);
+      log.info("History updated");
+    }
     llamaNodeCPP.temperature = store.get(temperatureName);
-    log.info("History updated");
     return historyParm.history;
   } catch (e) {
     log.error(e, result);
