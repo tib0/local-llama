@@ -1,14 +1,14 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
-import ChatBubbleSkeleton from "./chat-form/chat-bubble-skeleton";
-import ChatBubbleUser from "./chat-form/chat-bubble-user";
-import ChatBubbleSystem from "./chat-form/chat-bubble-system";
-import { MicIcon } from "../lib/icons";
-import { ChatHistoryItem } from "../lib/llamaNodeCppWrapper";
-import { ChatContext } from "../providers/chat";
-import usePersistentStorageValue from "../hooks/usePersistentStorageValue";
-import ModelInfos from "./model-infos";
-import ChatBubbleModel from "./chat-form/chat-bubble-model";
-import { isMac } from "../lib/os";
+import ChatBubbleSkeleton from "./chat-bubble-skeleton";
+import ChatBubbleUser from "./chat-bubble-user";
+import ChatBubbleSystem from "./chat-bubble-system";
+import { MicIcon } from "../../lib/icons";
+import { ChatHistoryItem } from "../../lib/llamaNodeCppWrapper";
+import { ChatContext } from "../../providers/chat";
+import usePersistentStorageValue from "../../hooks/usePersistentStorageValue";
+import ModelInfos from "../model-infos";
+import ChatBubbleModel from "./chat-bubble-model";
+import { isMac } from "../../lib/os";
 
 type ObjectWithStrings = {
   [index: string]: any[];
