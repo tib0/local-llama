@@ -87,7 +87,10 @@ export function appMenu(store: Store<Record<string, string>>, clearLocalData: ()
   ];
 }
 
-export function appContextMenu(params, mainWindow) {
+export function appContextMenu(
+  params: Electron.ContextMenuParams,
+  mainWindow: Electron.BrowserWindow,
+) {
   const menu = new Menu();
 
   for (const suggestion of params.dictionarySuggestions) {
@@ -130,7 +133,17 @@ export function appContextMenu(params, mainWindow) {
   menu.popup();
 }
 
-export function winBounds(store) {
+export function winBounds(
+  store: Store<
+    Record<
+      string,
+      {
+        width: number;
+        height: number;
+      }
+    >
+  >,
+) {
   const winBounds = {
     width: 1280,
     height: 680,
