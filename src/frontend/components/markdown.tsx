@@ -10,7 +10,11 @@ type MarkdownRendererProps = {
 };
 
 const MarkdownRenderer = ({ children: markdown }: MarkdownRendererProps) => {
-  const CopyButton = lazy(() => import("./copy-button"));
+  const CopyButton = lazy(() => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(import("./copy-button") as any), 500);
+    });
+  });
 
   return (
     <Markdown
