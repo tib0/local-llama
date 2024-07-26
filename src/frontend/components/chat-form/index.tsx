@@ -14,6 +14,8 @@ type ObjectWithStrings = {
   [index: string]: any[];
 };
 
+const MAX_PROMPT_HISTORY_ITEM = 4;
+
 const ChatForm = () => {
   const [error, setError] = useState<ObjectWithStrings>({
     title: [],
@@ -63,8 +65,12 @@ const ChatForm = () => {
       payload: [{ type: "user", text: prompt }] as ChatHistoryItem[],
     });
 
-    const newPromptHistory = promptHistory ?? [""];
+    let newPromptHistory = promptHistory ?? [""];
     if (!newPromptHistory.includes(prompt)) newPromptHistory.push(prompt);
+    if (newPromptHistory.length > MAX_PROMPT_HISTORY_ITEM + 1) {
+      newPromptHistory = newPromptHistory.slice(-1 * MAX_PROMPT_HISTORY_ITEM);
+      newPromptHistory.unshift("");
+    }
     setPromptHistory(newPromptHistory);
 
     init();
