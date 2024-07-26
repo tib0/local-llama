@@ -401,20 +401,10 @@ const ChatForm = () => {
           switch (c.type) {
             case "model":
               return (
-                <ChatBubbleModel
-                  key={index.toString()}
-                  index={index.toString()}
-                  text={c.response[0] as string}
-                />
+                <ChatBubbleModel index={index.toString()} text={c.response[0] as string} />
               );
             case "user":
-              return (
-                <ChatBubbleUser
-                  key={index.toString()}
-                  index={index.toString()}
-                  text={c.text}
-                />
-              );
+              return <ChatBubbleUser index={index.toString()} text={c.text} />;
             case "system":
               return (
                 <>
@@ -427,11 +417,7 @@ const ChatForm = () => {
               );
             default:
               return (
-                <ChatBubbleSystem
-                  key={"Error"}
-                  index={"Error"}
-                  text={"History element not found"}
-                />
+                <ChatBubbleSystem index={"Error" + index} text={"History element not found"} />
               );
           }
         })}
