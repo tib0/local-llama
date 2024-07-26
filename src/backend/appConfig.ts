@@ -1,5 +1,6 @@
 import { Menu, MenuItem, shell } from "electron";
 import path from "path";
+import type Store from "electron-store";
 
 export const promptSystem = `You are an assistant to a human being.`;
 
@@ -36,7 +37,7 @@ export const splashWindowOptions: Electron.BrowserWindowConstructorOptions = {
   width: 225,
 };
 
-export function appMenu(store) {
+export function appMenu(store: Store<Record<string, string>>, clearLocalData: () => void) {
   const isMacOS = process.platform === "darwin";
   return [
     ...(isMacOS ? [{ role: "appMenu" }] : []),
@@ -67,6 +68,12 @@ export function appMenu(store) {
           label: "Open model folder",
           click: async () => {
             await shell.openPath(store.get("model_dir"));
+          },
+        },
+        {
+          label: "Clear local data",
+          click: async () => {
+            if (clearLocalData) await clearLocalData();
           },
         },
         {

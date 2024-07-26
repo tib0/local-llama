@@ -8,6 +8,7 @@ import {
   net,
   protocol,
   shell,
+  session,
 } from "electron";
 import { handleSquirrelEvent } from "./backend/windowsSquirelInstallEvent";
 
@@ -157,7 +158,20 @@ const createWindow = () => {
     });
   }
 
-  Menu.setApplicationMenu(Menu.buildFromTemplate(appMenu(store)));
+  async function clearLocalData() {
+    log.info("Clear data");
+    await session.defaultSession.clearData();
+    log.info("Clear storage data");
+    await session.defaultSession.clearStorageData();
+    log.info("Clear cache");
+    await session.defaultSession.clearCache();
+    log.info("Clear store data");
+    store.clear();
+    log.info("About to quit the app");
+    app.quit();
+  }
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(appMenu(store, clearLocalData)));
 
   showWindow();
 };
