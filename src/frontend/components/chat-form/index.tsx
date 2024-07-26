@@ -186,7 +186,7 @@ const ChatForm = () => {
       }
       setLoadedChunk(newChunk);
     });
-  }, []);
+  }, [setLoadingModel, setLoadingModel]);
 
   return (
     <form
