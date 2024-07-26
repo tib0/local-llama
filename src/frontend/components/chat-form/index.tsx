@@ -236,11 +236,25 @@ const ChatForm = () => {
               onChange={handleSelectGpuChange}
               defaultValue="auto"
             >
-              <option value={"auto"}>Auto</option>
-              {isMac() && <option value={"metal"}>Use Metal</option>}
-              {!isMac() && <option value={"vulkan"}>Use Vulkan</option>}
-              <option value={"cuda"}>Use Cuda</option>
-              <option value={"false"}>No GPU</option>
+              <option key="option-auto" value={"auto"}>
+                Auto
+              </option>
+              {isMac() && (
+                <option key="option-metal" value={"metal"}>
+                  Use Metal
+                </option>
+              )}
+              {!isMac() && (
+                <option key="option-vulkan" value={"vulkan"}>
+                  Use Vulkan
+                </option>
+              )}
+              <option key="option-cuda" value={"cuda"}>
+                Use Cuda
+              </option>
+              <option key="option-false" value={"false"}>
+                No GPU
+              </option>
             </select>
           </div>
         </div>
