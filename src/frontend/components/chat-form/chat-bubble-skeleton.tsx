@@ -2,7 +2,7 @@ import MarkdownRenderer from "../markdown";
 
 const ChatBubbleSkeleton = ({ text }: { text: string }) => (
   <div
-    key={`model-chat-skel`}
+    key={`model-chat-skeleton`}
     className={`
     hover:cursor-wait
     card my-1 sm:my-2 py-2 px-4
