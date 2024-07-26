@@ -66,7 +66,7 @@ const Header = () => {
         name="theme-input-controller"
         aria-label="theme-input-controller"
         type="checkbox"
-        className={`theme-controller`}
+        className={`theme-controller not-drag-window`}
         value={localTheme}
         onClick={() => setLocalTheme(localTheme == "dracula" ? "lemonade" : "dracula")}
       />
@@ -135,7 +135,7 @@ const Header = () => {
             {menuLink("DESKTOP")}
           </ul>
         </div>
-        <div className="navbar-end hidden md:flex pr-1 not-drag-window">
+        <div className="navbar-end hidden md:flex pr-1">
           {/* DESKTOP */}
           <label aria-label="Swap theme" className="swap swap-rotate px-2">
             {themeSwap}
