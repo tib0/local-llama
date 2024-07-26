@@ -377,9 +377,9 @@ async function loadHistory(event) {
     store.set(temperatureName, historyParm.temperature ?? defaultGPU);
     log.info("Clearing node llama cpp previous history");
     llamaNodeCPP.clearHistory();
-    if (!historyParm.modelPath || !fs.existsSync(historyParm.modelPath)) {
-      log.warn("Model path not found");
-      log.info("History will be updated without updating model");
+    if (!historyParm.model_path || !fs.existsSync(historyParm.model_path)) {
+      log.warn("Model path not found in:", historyParm.model_path, "from", historyParm);
+      log.info("Sticking to current model");
     } else {
       store.set(seletedModelName, historyParm.model_path ?? "");
       log.info("Disposing model and session");
