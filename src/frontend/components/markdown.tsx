@@ -33,6 +33,8 @@ const MarkdownRenderer = ({ children: markdown }: MarkdownRendererProps) => {
                 <CopyButton code={String(children)} />
               </Suspense>
               <SyntaxHighlighter
+                showLineNumbers={true}
+                lineProps={{ style: { wordBreak: "break-word", whiteSpace: "pre-wrap" } }}
                 wrapLines={true}
                 style={vscDarkPlus}
                 PreTag="div"
