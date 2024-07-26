@@ -361,25 +361,21 @@ async function loadHistory(event) {
     store.set(systemPromptName, historyParm.prompt_system ?? "");
     store.set(gpuName, historyParm.gpu ?? defaultGPU);
     store.set(temperatureName, historyParm.temperature ?? defaultGPU);
+    log.info("Clearing node llama cpp previous history");
+    llamaNodeCPP.clearHistory();
     if (!historyParm.modelPath || !fs.existsSync(historyParm.modelPath)) {
       log.warn("Model path not found");
-      log.info("Clearing node llama cpp previous history");
-      llamaNodeCPP.clearHistory();
-      await llamaNodeCPP.setHistory(historyParm.history);
-      log.info("History updated without updating model");
+      log.info("History will be updated without updating model");
     } else {
       store.set(seletedModelName, historyParm.model_path ?? "");
-      log.info("Clearing node llama cpp history");
-      llamaNodeCPP.clearHistory();
       log.info("Disposing model and session");
       await llamaNodeCPP.disposeSession();
       await llamaNodeCPP.disposeModel();
       await llamaNodeCPP.disposeLlama();
-
       await loadModel(event, historyParm.model_path);
-      await llamaNodeCPP.setHistory(historyParm.history);
-      log.info("History updated");
     }
+    await llamaNodeCPP.setHistory(historyParm.history);
+    log.info("History updated");
     llamaNodeCPP.temperature = store.get(temperatureName);
     return historyParm.history;
   } catch (e) {
