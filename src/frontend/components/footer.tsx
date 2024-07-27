@@ -33,7 +33,6 @@ const Footer = () => {
               className={`link`}
               aria-label="Linkedin-Tib0"
               target="blank"
-              href={undefined}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -48,7 +47,6 @@ const Footer = () => {
               className={`link`}
               aria-label="Github-Tib0"
               target="blank"
-              href={undefined}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -61,7 +59,6 @@ const Footer = () => {
               className={`link`}
               aria-label="Soundcloud-Tib0"
               target="blank"
-              href={undefined}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
