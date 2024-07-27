@@ -25,9 +25,16 @@ function About(): JSX.Element {
                   'You will be able to run gguf models. You can find them by searching for "gguf" at '
                 }
                 <a
-                  className="link-primary font-black"
-                  href="https://huggingface.co/models?search=gguf"
-                  target="_blank"
+                  className={`link link-primary font-black`}
+                  aria-label="Hugginface search for gguf"
+                  target="blank"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.electronAPI.openExternalLink(
+                      "https://huggingface.co/models?search=gguf",
+                    );
+                  }}
                 >
                   Hugginface.co
                 </a>
@@ -77,9 +84,16 @@ function About(): JSX.Element {
               <ul className="text-left list-none list-inside mx-4 py-2 max-w-lg">
                 <li className="mt-1">
                   <a
-                    href="https://github.com/fozziethebeat/electron-forge-plugin-vite-esm#plugin-vite-esm"
-                    target="_blank"
-                    className="font-black text-primary text-xl mr-1"
+                    className={`link font-black text-primary text-xl mr-1`}
+                    aria-label="ggerganov github"
+                    target="blank"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.electronAPI.openExternalLink(
+                        "https://github.com/fozziethebeat/electron-forge-plugin-vite-esm#plugin-vite-esm",
+                      );
+                    }}
                   >
                     fozziethebeat
                   </a>
@@ -89,9 +103,16 @@ function About(): JSX.Element {
                 </li>
                 <li className="mt-1">
                   <a
-                    href="https://github.com/withcatai/node-llama-cpp"
-                    target="_blank"
-                    className="font-black text-primary text-xl mr-1"
+                    className={`link font-black text-primary text-xl mr-1`}
+                    aria-label="giladgd github"
+                    target="blank"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.electronAPI.openExternalLink(
+                        "https://github.com/withcatai/node-llama-cpp",
+                      );
+                    }}
                   >
                     giladgd
                   </a>
@@ -99,9 +120,16 @@ function About(): JSX.Element {
                 </li>
                 <li className="mt-1">
                   <a
-                    href="https://github.com/ggerganov/llama.cpp"
-                    target="_blank"
-                    className="font-black text-primary text-xl mr-1"
+                    className={`link font-black text-primary text-xl mr-1`}
+                    aria-label="ggerganov github"
+                    target="blank"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.electronAPI.openExternalLink(
+                        "https://github.com/ggerganov/llama.cpp",
+                      );
+                    }}
                   >
                     ggerganov
                   </a>
