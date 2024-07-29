@@ -81,6 +81,8 @@ if (app.isPackaged) {
   log.transports.console.level = "silly";
 }
 
+log.eventLogger.startLogging();
+
 let llamaNodeCPP = new LlamaWrapper();
 llamaNodeCPP.logger = log;
 
