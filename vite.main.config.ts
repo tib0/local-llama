@@ -4,7 +4,7 @@ export default defineConfig({
   build: {
     minify: true,
     rollupOptions: {
-      external: ["node-llama-cpp"],
+      external: ["node-llama-cpp", "officeparser"],
     },
   },
   resolve: {
