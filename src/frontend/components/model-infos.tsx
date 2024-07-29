@@ -99,14 +99,13 @@ function ModelInfos({ model }: { model: string }) {
   }, []);
 
   useEffect(() => {
-    if (!temperature || isNaN(temperature))
-      setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
+    if (!temperature || isNaN(temperature)) setTemperature(modelInfo?.llama?.temperature * 50);
     defineTempIco(temperature ?? 0);
   }, [modelInfo?.llama?.temperature, temperature]);
 
   useEffect(() => {
-    setTemperature(modelInfo?.llama?.temperature * 50 ?? 0);
-    defineTempIco(modelInfo?.llama?.temperature * 50 ?? 0);
+    setTemperature(modelInfo?.llama?.temperature * 50);
+    defineTempIco(modelInfo?.llama?.temperature * 50);
   }, [modelInfo?.model?.filename, modelInfo?.llama?.temperature]);
 
   return (
@@ -206,7 +205,7 @@ function ModelInfos({ model }: { model: string }) {
                   Set system prompt...
                 </div>
                 <div className="collapse-content">
-                  <div className="prose">
+                  <div className="prose max-w-full">
                     <div className="font-semibold">
                       This is the current system prompt, input a new one below if you want, be
                       creative ! The session will be reseted after System Prompt update.
@@ -215,11 +214,17 @@ function ModelInfos({ model }: { model: string }) {
                       {modelInfo && modelInfo.context && (
                         <>
                           <p className="font-light text-base-content/60">
-                            {modelInfo.context.systemPrompt}
+                            {modelInfo.context.systemPrompt.slice(0, 999)}
+                            {modelInfo.context.systemPrompt.length > 1000 && <>...</>}
                           </p>
                         </>
                       )}
                     </blockquote>
+                    {modelInfo &&
+                      modelInfo.context &&
+                      modelInfo.context.systemPrompt.length > 1000 && (
+                        <>{`${(modelInfo.context.systemPrompt.length - 1000).toLocaleString()} characters hidden.`}</>
+                      )}
                   </div>
                   <div className="flex flex-col justify-center">
                     <label
