@@ -29,4 +29,5 @@ export interface IElectronAPI {
   openExternalLink: (h) => Promise<void>;
   quitApp: () => Promise<void>;
   saveHistory: () => Promise<string>;
+  selectDocumentToParse: () => Promise<void>;
 }

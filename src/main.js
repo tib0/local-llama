@@ -32,6 +32,7 @@ import {
 } from "./backend/appConfig";
 import { initFolder, initSelectedModel, initStoreValue } from "./backend/appHelpers";
 import log from "electron-log/main";
+import { parseOfficeAsync } from "officeparser";
 
 const store = new Store();
 
@@ -54,6 +55,7 @@ const defaultTemperature = 0;
 
 const historyFileExtension = "lllh";
 const modelFileExtension = "gguf";
+const documentFileExtension = ["docx", "pptx", "xlsx", "odt", "odp", "ods", "pdf", "txt"];
 
 const logsFileName = "Local-Llama.log";
 
@@ -234,6 +236,8 @@ ipcMain.on("model-clear-history", clearHistory);
 ipcMain.on("open-external-link", openExternalLink);
 
 ipcMain.on("clipboard-copy", clipboardCopy);
+
+ipcMain.on("document-change", selectDocumentToParse);
 
 async function clipboardCopy(_event, content) {
   log.info("Copy to clipboard triggered");
@@ -493,6 +497,96 @@ async function changeModel(event) {
       window.webContents.send("model-changed", "");
     }
   } else {
-    await loadModel(event, filePaths[0]);
+    try {
+      await loadModel(event, filePaths[0]);
+    } catch (error) {
+      log.error(error);
+    }
+  }
+}
+
+const prefixDocument =
+  'Your duty is to answer question about the following document content: {"';
+
+const suffixDocument =
+  '"}. You answer in the same language as the user asking you question is speaking.';
+
+async function parseOfficeDocument(event, filePath) {
+  log.info("About to parse office document:", filePath);
+  const config = {
+    newlineDelimiter: "<{NewLine}>",
+    ignoreNotes: true,
+    outputErrorToConsole: true,
+  };
+  try {
+    await parseOfficeAsync(filePath, config)
+      .then(async (data) => {
+        log.info("Document parsed successfully");
+        await changeModelSystemPrompt(
+          event,
+          prefixDocument +
+            data
+              .toString()
+              .replace(/\s\s+/g, " ")
+              .replace(/\-\<\{NewLine\}\>+/g, "")
+              .replace(/\<\{NewLine\}\>+/g, " ")
+              .replace(/\.\.+/g, ".")
+              .slice(0, 16000) +
+            suffixDocument,
+        );
+      })
+      .catch((error) => log.error(error));
+  } catch (error) {
+    log.error(error);
+  }
+}
+
+async function parseTextDocument(event, filePath) {
+  log.info("About to parse text document:", filePath);
+  try {
+    fs.readFile(filePath, async (error, data) => {
+      if (error) {
+        log.error(error);
+      } else {
+        log.info("Document parsed successfully");
+        await changeModelSystemPrompt(
+          event,
+          prefixDocument +
+            data
+              .toString()
+              .replace(/\s\s+/g, " ")
+              .replace(/\-\<\{NewLine\}\>+/g, "")
+              .replace(/\<\{NewLine\}\>+/g, " ")
+              .replace(/\.\.+/g, ".")
+              .slice(0, 16000) +
+            suffixDocument,
+        );
+      }
+    });
+  } catch (error) {
+    log.error(error);
+  }
+}
+
+async function selectDocumentToParse(event) {
+  log.info("Select a document to parse");
+  const { filePaths } = await dialog.showOpenDialog({
+    filters: [{ name: "Models", extensions: documentFileExtension }],
+    defaultPath: os.homedir(),
+    properties: ["openFile"],
+  });
+  if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
+    log.info("Selected document not found or operation canceled");
+  } else {
+    log.info(path.extname(filePaths[0]));
+    switch (path.extname(filePaths[0])) {
+      case ".txt":
+        await parseTextDocument(event, filePaths[0]);
+        break;
+
+      default:
+        await parseOfficeDocument(event, filePaths[0]);
+        break;
+    }
   }
 }
