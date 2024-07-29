@@ -90,6 +90,7 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "dependencies": {
-    "node-llama-cpp": "3.0.0-beta.37"
+    "node-llama-cpp": "3.0.0-beta.37",
+    "officeparser": "^4.1.1"
   }
 }
