@@ -13,9 +13,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getModelInfo: () => ipcRenderer.invoke("model-info"),
   loadHistory: () => ipcRenderer.invoke("model-load-history"),
   loadModel: (model) => ipcRenderer.invoke("model-load", model),
-  onModelChange: (callback) => ipcRenderer.on("model-changed", (_, arg) => callback(arg)),
   onChunkReceive: (callback) => ipcRenderer.on("chunk-received", (_, arg) => callback(arg)),
+  onModelChange: (callback) => ipcRenderer.on("model-changed", (_, arg) => callback(arg)),
   openExternalLink: (href) => ipcRenderer.send("open-external-link", href),
   quitApp: () => ipcRenderer.invoke("quit-app"),
   saveHistory: () => ipcRenderer.invoke("model-save-history"),
+  selectDocumentToParse: () => ipcRenderer.send("document-change"),
 });
