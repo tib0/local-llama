@@ -261,53 +261,59 @@ async function loadModel(_event, modelPath) {
     await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
   }
 
-  const infos = await llamaNodeCPP.getInfos();
-  if (
-    llamaNodeCPP.isReady() &&
-    infos.model !== undefined &&
-    selectedModelPath.includes(infos.model?.filename) &&
-    (store.get(gpuName) === infos.llama?.gpu || store.get(gpuName) === "auto")
-  ) {
-    log.info(
-      "Selected model is allready running with same parameters, broadcast the information to each window",
-    );
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("model-changed", "");
+  try {
+    const infos = await llamaNodeCPP.getInfos();
+    if (
+      llamaNodeCPP.isReady() &&
+      infos.model !== undefined &&
+      selectedModelPath.includes(infos.model?.filename) &&
+      (store.get(gpuName) === infos.llama?.gpu || store.get(gpuName) === "auto")
+    ) {
+      log.info(
+        "Selected model is allready running with same parameters, broadcast the information to each window",
+      );
+      for (const window of BrowserWindow.getAllWindows()) {
+        window.webContents.send("model-changed", "");
+      }
+      return selectedModelPath;
     }
-    return selectedModelPath;
-  }
 
-  if (llamaNodeCPP.isReady() && infos.context !== undefined) {
-    log.info(
-      "Llama node cpp allready running, about to dispose model and session before reloading",
-    );
-    llamaNodeCPP.clearHistory();
-    await llamaNodeCPP.disposeModel();
-    await llamaNodeCPP.disposeSession();
-    await llamaNodeCPP.disposeLlama();
-    await llamaNodeCPP.loadLlama(store.get(gpuName) === "false" ? false : store.get(gpuName));
-  }
-  await llamaNodeCPP.loadModel(selectedModelPath);
-  log.info("New model loaded");
-  await llamaNodeCPP.initSession(store.get(systemPromptName) ?? promptSystem);
-  log.info("New session initialized");
+    if (llamaNodeCPP.isReady() && infos.context !== undefined) {
+      log.info(
+        "Llama node cpp allready running, about to dispose model and session before reloading",
+      );
+      llamaNodeCPP.clearHistory();
+      await llamaNodeCPP.disposeModel();
+      await llamaNodeCPP.disposeSession();
+      await llamaNodeCPP.disposeLlama();
+      await llamaNodeCPP.loadLlama(
+        store.get(gpuName) === "false" ? false : store.get(gpuName),
+      );
+    }
+    await llamaNodeCPP.loadModel(selectedModelPath);
+    log.info("New model loaded");
+    await llamaNodeCPP.initSession(store.get(systemPromptName) ?? promptSystem);
+    log.info("New session initialized");
 
-  log.info("Broadcast model changed event to each window");
-  for (const window of BrowserWindow.getAllWindows()) {
-    window.webContents.send("model-changed", selectedModelPath);
-  }
+    log.info("Broadcast model changed event to each window");
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("model-changed", selectedModelPath);
+    }
 
-  store.set(seletedModelName, selectedModelPath ?? "");
+    store.set(seletedModelName, selectedModelPath ?? "");
 
-  if (llamaNodeCPP.isReady()) {
-    log.info("Llama node cpp is ready after loading the model");
-    return selectedModelPath;
-  } else {
-    log.warn(
-      "Llama node cpp was not initialized correctly, about to reset default GPU usage.",
-    );
-    store.set(gpuName, defaultGPU);
-    return "";
+    if (llamaNodeCPP.isReady()) {
+      log.info("Llama node cpp is ready after loading the model");
+      return selectedModelPath;
+    } else {
+      log.warn(
+        "Llama node cpp was not initialized correctly, about to reset default GPU usage.",
+      );
+      store.set(gpuName, defaultGPU);
+      return "";
+    }
+  } catch (error) {
+    log.error(error);
   }
 }
 
