@@ -80,6 +80,10 @@ function ModelInfos({ model }: { model: string }) {
     });
   }
 
+  async function changeDocument() {
+    await window.electronAPI.selectDocumentToParse();
+  }
+
   const sendTemperature = async (e) => {
     await window.electronAPI.changeTemperature(
       parseFloat((Number(e.target.value) / 50).toFixed(2)),
@@ -206,30 +210,30 @@ function ModelInfos({ model }: { model: string }) {
                 </div>
                 <div className="collapse-content">
                   <div className="prose max-w-full">
-                    <div className="font-semibold">
+                    <div className="font-medium leading-6">
                       This is the current system prompt, input a new one below if you want, be
                       creative ! The session will be reseted after System Prompt update.
+                      {modelInfo &&
+                        modelInfo.context &&
+                        modelInfo.context.systemPrompt.length > 1000 && (
+                          <>{` ${(modelInfo.context.systemPrompt.length - 1000).toLocaleString()} characters hidden from below text.`}</>
+                        )}
                     </div>
                     <blockquote>
                       {modelInfo && modelInfo.context && (
                         <>
                           <p className="font-light text-base-content/60">
                             {modelInfo.context.systemPrompt.slice(0, 999)}
-                            {modelInfo.context.systemPrompt.length > 1000 && <>...</>}
+                            {modelInfo.context.systemPrompt.length > 1000 && <>{` (...)`}</>}
                           </p>
                         </>
                       )}
                     </blockquote>
-                    {modelInfo &&
-                      modelInfo.context &&
-                      modelInfo.context.systemPrompt.length > 1000 && (
-                        <>{`${(modelInfo.context.systemPrompt.length - 1000).toLocaleString()} characters hidden.`}</>
-                      )}
                   </div>
                   <div className="flex flex-col justify-center">
                     <label
                       className={`
-                        sticky z-10 top-[4.2rem] bg-base-100 h-20 my-2
+                        bg-base-100 h-20 my-2
                         border-primary/30 bordered border-2 
                         shadow-xl rounded-xl flex items-center 
                         transition-all justify-between
@@ -292,6 +296,26 @@ function ModelInfos({ model }: { model: string }) {
                         </button>
                       </div>
                     </label>
+                    <div className="font-medium leading-6 text-md pt-4 text-base-content/75">
+                      You can upload a document to provide system prompt content by clicking
+                      the following button. Up to 16K characters are retained, any excess will
+                      be ignored. Support docx, pptx, xlsx, odt, odp, ods, pdf and txt
+                      documents.
+                      <div className="w-full flex justify-end">
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm shadow-xl"
+                          aria-label="Load another document"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            changeDocument();
+                          }}
+                        >
+                          Document...
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
