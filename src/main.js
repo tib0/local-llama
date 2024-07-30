@@ -506,10 +506,20 @@ async function changeModel(event) {
 }
 
 const prefixDocument =
-  'Your duty is to answer question about the following document content: {"';
+  'Your duty is to answer question about the following document content: "';
 
 const suffixDocument =
-  '"}. You answer in the same language as the user asking you question is speaking.';
+  '". You answer in the same language as the user asking you question is speaking.';
+
+function getCleanedPrompt(data) {
+  return data
+    .toString()
+    .replace(/\s\s+/g, " ")
+    .replace(/\-\<\{NewLine\}\>+/g, "")
+    .replace(/\<\{NewLine\}\>+/g, " ")
+    .replace(/\.\.+/g, ".")
+    .slice(0, 16000);
+}
 
 async function parseOfficeDocument(event, filePath) {
   log.info("About to parse office document:", filePath);
@@ -524,15 +534,7 @@ async function parseOfficeDocument(event, filePath) {
         log.info("Document parsed successfully");
         await changeModelSystemPrompt(
           event,
-          prefixDocument +
-            data
-              .toString()
-              .replace(/\s\s+/g, " ")
-              .replace(/\-\<\{NewLine\}\>+/g, "")
-              .replace(/\<\{NewLine\}\>+/g, " ")
-              .replace(/\.\.+/g, ".")
-              .slice(0, 16000) +
-            suffixDocument,
+          prefixDocument + getCleanedPrompt(data) + suffixDocument,
         );
       })
       .catch((error) => log.error(error));
@@ -551,15 +553,7 @@ async function parseTextDocument(event, filePath) {
         log.info("Document parsed successfully");
         await changeModelSystemPrompt(
           event,
-          prefixDocument +
-            data
-              .toString()
-              .replace(/\s\s+/g, " ")
-              .replace(/\-\<\{NewLine\}\>+/g, "")
-              .replace(/\<\{NewLine\}\>+/g, " ")
-              .replace(/\.\.+/g, ".")
-              .slice(0, 16000) +
-            suffixDocument,
+          prefixDocument + getCleanedPrompt(data) + suffixDocument,
         );
       }
     });
@@ -578,7 +572,6 @@ async function selectDocumentToParse(event) {
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
     log.info("Selected document not found or operation canceled");
   } else {
-    log.info(path.extname(filePaths[0]));
     switch (path.extname(filePaths[0])) {
       case ".txt":
         await parseTextDocument(event, filePaths[0]);
