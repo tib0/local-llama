@@ -99,10 +99,6 @@ const ChatForm = () => {
     await window.electronAPI.clearHistory();
   }
 
-  async function changeDocument() {
-    await window.electronAPI.selectDocumentToParse();
-  }
-
   async function abortPrompt() {
     setLoadedChunk("");
     setLoadedPromptChunks("");
@@ -261,18 +257,6 @@ const ChatForm = () => {
               </option>
             </select>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm shadow-xl"
-            aria-label="Load another document"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              changeDocument();
-            }}
-          >
-            Document
-          </button>
         </div>
         <div className="flex gap-2">
           <button
