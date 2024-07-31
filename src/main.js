@@ -35,6 +35,7 @@ import log from "electron-log/main";
 import { parseOfficeAsync } from "officeparser";
 
 const store = new Store();
+const llamaNodeCPP = new LlamaWrapper();
 
 protocol.registerSchemesAsPrivileged([{ scheme: "app" }]);
 
@@ -49,6 +50,8 @@ const seletedModelName = "selected_model";
 const gpuName = "gpu";
 const temperatureName = "temperature";
 const systemPromptName = "prompt_system";
+const lastModelFilePathName = "last_model_file_path";
+const lastDocumentFilePathName = "last_document_file_path";
 
 const defaultGPU = "auto";
 const defaultTemperature = 0;
@@ -85,7 +88,6 @@ if (app.isPackaged) {
 
 log.eventLogger.startLogging();
 
-let llamaNodeCPP = new LlamaWrapper();
 llamaNodeCPP.logger = log;
 
 const createWindow = () => {
@@ -488,7 +490,10 @@ async function changeModel(event) {
   log.info("Updating the model");
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: [modelFileExtension] }],
-    defaultPath: store.get(modelsFolderName),
+    defaultPath:
+      store.get(lastModelFilePathName) && store.get(lastModelFilePathName) !== ""
+        ? store.get(lastModelFilePathName)
+        : store.get(modelsFolderName),
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
@@ -499,6 +504,7 @@ async function changeModel(event) {
   } else {
     try {
       await loadModel(event, filePaths[0]);
+      store.set(lastModelFilePathName, filePaths[0]);
     } catch (error) {
       log.error(error);
     }
@@ -538,6 +544,7 @@ async function parseOfficeDocument(event, filePath) {
         );
       })
       .catch((error) => log.error(error));
+    store.set(lastDocumentFilePathName, filePath);
   } catch (error) {
     log.error(error);
   }
@@ -557,6 +564,7 @@ async function parseTextDocument(event, filePath) {
         );
       }
     });
+    store.set(lastDocumentFilePathName, filePath);
   } catch (error) {
     log.error(error);
   }
@@ -566,7 +574,10 @@ async function selectDocumentToParse(event) {
   log.info("Select a document to parse");
   const { filePaths } = await dialog.showOpenDialog({
     filters: [{ name: "Models", extensions: documentFileExtension }],
-    defaultPath: os.homedir(),
+    defaultPath:
+      store.get(lastDocumentFilePathName) && store.get(lastDocumentFilePathName) !== ""
+        ? store.get(lastDocumentFilePathName)
+        : os.homedir(),
     properties: ["openFile"],
   });
   if (filePaths === undefined || filePaths?.length < 1 || !fs.existsSync(filePaths[0])) {
@@ -576,7 +587,6 @@ async function selectDocumentToParse(event) {
       case ".txt":
         await parseTextDocument(event, filePaths[0]);
         break;
-
       default:
         await parseOfficeDocument(event, filePaths[0]);
         break;
