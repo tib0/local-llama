@@ -189,6 +189,7 @@ generated file.
   > ##
 
 - **Model name**: This toggle button is used to display extended informations about the model.
+- **Document...**: This button allows you to select a document and insert its content into the system prompt.
 
 ### Extended informations
 
