@@ -41,7 +41,7 @@ protocol.registerSchemesAsPrivileged([{ scheme: "app" }]);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const cache = path.join(os.homedir(), ".cache/local-llama");
+const cacheFolderPath = path.join(os.homedir(), ".cache/local-llama");
 
 const modelsFolderName = "models";
 const historyFolderName = "history";
@@ -62,9 +62,9 @@ const documentFileExtension = ["docx", "pptx", "xlsx", "odt", "odp", "ods", "pdf
 
 const logsFileName = "Local-Llama.log";
 
-const modelsFolderPath = path.join(cache, modelsFolderName);
-const historyFolderPath = path.join(cache, historyFolderName);
-const logsFolderPath = path.join(cache, logsFolderName);
+const modelsFolderPath = path.join(cacheFolderPath, modelsFolderName);
+const historyFolderPath = path.join(cacheFolderPath, historyFolderName);
+const logsFolderPath = path.join(cacheFolderPath, logsFolderName);
 
 initFolder(store, modelsFolderPath, modelsFolderName);
 initFolder(store, historyFolderPath, historyFolderName);
@@ -533,6 +533,7 @@ async function parseOfficeDocument(event, filePath) {
     newlineDelimiter: "<{NewLine}>",
     ignoreNotes: true,
     outputErrorToConsole: true,
+    tempFilesLocation: cacheFolderPath,
   };
   try {
     await parseOfficeAsync(filePath, config)

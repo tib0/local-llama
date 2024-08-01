@@ -189,7 +189,8 @@ generated file.
   > ##
 
 - **Model name**: This toggle button is used to display extended informations about the model.
-- **Document...**: This button allows you to select a document and insert its content into the system prompt.
+- **Document...**: This button allows you to select a document and insert its content into the
+  system prompt. Keeps only the first 16K characters found inside the document.
 
 ### Extended informations
 
@@ -227,7 +228,8 @@ a node.js module, ensuring smooth compatibility with both Electron and native co
 
 Upon launching the application, a folder structure is created to store history, models, and
 logs. This folder is located under your current user folder, which is represented by
-`%USERPROFILE%` in Windows and `~` in MacOS/Linux.
+`%USERPROFILE%` in Windows and `~` in MacOS/Linux. When you utilize a document to generate a prompt,
+the document parser employs `.cache` folder to create temporary files.
 
 The folder structure is organized as follows:
 
