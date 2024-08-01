@@ -228,8 +228,8 @@ a node.js module, ensuring smooth compatibility with both Electron and native co
 
 Upon launching the application, a folder structure is created to store history, models, and
 logs. This folder is located under your current user folder, which is represented by
-`%USERPROFILE%` in Windows and `~` in MacOS/Linux. When you utilize a document to generate a prompt,
-the document parser employs `.cache` folder to create temporary files.
+`%USERPROFILE%` in Windows and `~` in MacOS/Linux. When you utilize a document to generate a
+prompt, the document parser employs `.cache` folder to create temporary files.
 
 The folder structure is organized as follows:
 
