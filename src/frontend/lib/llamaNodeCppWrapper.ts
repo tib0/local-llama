@@ -1,8 +1,9 @@
 import {
-  type LlamaChatSession,
   type ChatHistoryItem,
+  type LlamaChatSession,
   type LlamaModel,
   type Llama,
+  LlamaLogLevel,
 } from "node-llama-cpp";
 import { v4 as uuidv4 } from "uuid";
 import { type MainLogger } from "electron-log";
@@ -414,14 +415,26 @@ export class LlamaWrapper {
         build: "never",
         progressLogs: false,
         gpu: gpu ?? "auto",
+        logLevel: LlamaLogLevel.debug,
       });
 
       this.llama.logger = (level, message) => {
-        if (level === this.module.LlamaLogLevel.error) {
-          this.setStatus(error, message);
-        }
-        if (level === this.module.LlamaLogLevel.warn) {
-          this.setStatus(warning, message);
+        if (message.length > 2) {
+          switch (level) {
+            case this.module.LlamaLogLevel.fatal:
+            case this.module.LlamaLogLevel.error:
+              this.setStatus(error, "[LlamaEngine] " + message);
+              break;
+            case this.module.LlamaLogLevel.warn:
+              this.setStatus(warning, "[LlamaEngine] " + message);
+              break;
+            case this.module.LlamaLogLevel.info:
+              this.logger.silly("[LlamaEngine]", message);
+              break;
+            case this.module.LlamaLogLevel.debug:
+              this.logger.silly("[LlamaEngine]", message);
+              break;
+          }
         }
       };
     } catch (err) {
