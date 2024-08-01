@@ -487,7 +487,7 @@ export class LlamaWrapper {
     try {
       this.setStatus(loading, `Initializing session`);
 
-      const context = await this.model.createContext({ threads: 8 });
+      const context = await this.model.createContext({ threads: 0, });
       if (context.sequencesLeft === 0) {
         return;
       }
