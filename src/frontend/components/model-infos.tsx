@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import debounce from "lodash.debounce";
 import { LlamaCppInfo } from "../lib/llamaNodeCppWrapper";
-import { MicIcon, WarningIcon } from "../lib/icons";
+import { EnterIcon, WarningIcon } from "../lib/icons";
 import { ChatContext } from "../providers/chat";
 import images from "../lib/images";
 import { titleCase } from "../lib/text";
@@ -292,7 +292,7 @@ function ModelInfos({ model }: { model: string }) {
                             sendSystemPrompt();
                           }}
                         >
-                          <MicIcon />
+                          <EnterIcon />
                         </button>
                       </div>
                     </label>

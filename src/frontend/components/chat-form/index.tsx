@@ -2,7 +2,7 @@ import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import ChatBubbleSkeleton from "./chat-bubble-skeleton";
 import ChatBubbleUser from "./chat-bubble-user";
 import ChatBubbleSystem from "./chat-bubble-system";
-import { MicIcon } from "../../lib/icons";
+import { EnterIcon } from "../../lib/icons";
 import { ChatHistoryItem } from "../../lib/llamaNodeCppWrapper";
 import { ChatContext } from "../../providers/chat";
 import usePersistentStorageValue from "../../hooks/usePersistentStorageValue";
@@ -392,7 +392,7 @@ const ChatForm = () => {
                 sendPrompt();
               }}
             >
-              <MicIcon />
+              <EnterIcon />
             </button>
           </div>
         </label>

@@ -695,3 +695,26 @@ export const WarningIcon = ({
     />
   </svg>
 );
+
+export const EnterIcon = ({
+  strokeColor = "oklch(var(--p))",
+  classname = "w-6 h-6 mt-0.5",
+}: {
+  classname?: string | undefined;
+  strokeColor?: string | undefined;
+}) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="transparent"
+    viewBox="0 0 24 24"
+    stroke-width={1.5}
+    stroke={strokeColor}
+    className={classname}
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="m7.49 12-3.75 3.75m0 0 3.75 3.75m-3.75-3.75h16.5V4.499"
+    />
+  </svg>
+);
