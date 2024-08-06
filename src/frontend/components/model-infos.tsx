@@ -222,7 +222,7 @@ function ModelInfos({ model }: { model: string }) {
                     <blockquote>
                       {modelInfo && modelInfo.context && (
                         <>
-                          <p className="font-light text-base-content/60">
+                          <p className="font-light text-base-content/60 break-all md:break-words">
                             {modelInfo.context.systemPrompt.slice(0, 999)}
                             {modelInfo.context.systemPrompt.length > 1000 && <>{` (...)`}</>}
                           </p>
@@ -296,7 +296,7 @@ function ModelInfos({ model }: { model: string }) {
                         </button>
                       </div>
                     </label>
-                    <div className="font-medium leading-6 text-md pt-4 text-base-content/75">
+                    <div className="font-light leading-6 text-md pt-4 text-base-content/75">
                       You can upload a document to provide system prompt content by clicking
                       the following button. Up to 16K characters are retained, any excess will
                       be ignored. Support docx, pptx, xlsx, odt, odp, ods, pdf and txt
