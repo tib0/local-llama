@@ -12,13 +12,15 @@ export const mainWindowOptions = (dirname: string) =>
     center: true,
     frame: false,
     hasShadow: true,
-    height: 682,
+    height: 424,
+    minHeight: 424,
     maximizable: true,
     minimizable: true,
     movable: true,
     resizable: true,
     show: false,
-    width: 450,
+    width: 334,
+    minWidth: 334,
   }) as Electron.BrowserWindowConstructorOptions;
 
 export const splashWindowOptions: Electron.BrowserWindowConstructorOptions = {
