@@ -1,4 +1,4 @@
-import { Menu, MenuItem, shell } from "electron";
+import { app, Menu, MenuItem, shell } from "electron";
 import path from "path";
 import type Store from "electron-store";
 
@@ -95,6 +95,12 @@ export function appContextMenu(
 ) {
   const menu = new Menu();
 
+  if (!app.isPackaged) {
+    menu.append(new MenuItem({ role: "toggleDevTools" }));
+    if (params.dictionarySuggestions.length > 0 || params.misspelledWord)
+      menu.append(new MenuItem({ type: "separator" }));
+  }
+
   for (const suggestion of params.dictionarySuggestions) {
     menu.append(
       new MenuItem({
@@ -121,16 +127,23 @@ export function appContextMenu(
 
   const editable = params.isEditable;
 
-  menu.append(new MenuItem({ type: "separator" }));
-  menu.append(new MenuItem({ role: "undo", enabled: canUndo && editable }));
-  menu.append(new MenuItem({ role: "redo", enabled: canRedo && editable }));
-  menu.append(new MenuItem({ type: "separator" }));
-  menu.append(new MenuItem({ role: "cut", enabled: canCut && editable }));
-  menu.append(new MenuItem({ role: "copy", enabled: canCopy }));
-  menu.append(new MenuItem({ role: "paste", enabled: canPaste && editable }));
-  menu.append(new MenuItem({ role: "delete", enabled: canDelete && editable }));
-  menu.append(new MenuItem({ type: "separator" }));
-  menu.append(new MenuItem({ role: "selectAll", enabled: canSelectAll }));
+  menu.append(new MenuItem({ type: "separator", visible: (canUndo || canRedo) && editable }));
+  menu.append(new MenuItem({ role: "undo", visible: canUndo && editable }));
+  menu.append(new MenuItem({ role: "redo", visible: canRedo && editable }));
+  menu.append(
+    new MenuItem({
+      type: "separator",
+      visible: ((canCut || canPaste || canDelete) && editable) || canCopy,
+    }),
+  );
+  menu.append(new MenuItem({ role: "cut", visible: canCut && editable }));
+  menu.append(new MenuItem({ role: "copy", visible: canCopy }));
+  menu.append(new MenuItem({ role: "paste", visible: canPaste && editable }));
+  menu.append(new MenuItem({ role: "delete", visible: canDelete && editable }));
+  menu.append(new MenuItem({ type: "separator", visible: canSelectAll }));
+  menu.append(
+    new MenuItem({ role: "selectAll", enabled: canSelectAll, visible: canSelectAll }),
+  );
 
   menu.popup();
 }
