@@ -7,7 +7,7 @@ import images from "../lib/images";
 import { titleCase } from "../lib/text";
 import { getSep } from "../lib/os";
 
-function ModelInfos({ model }: { model: string }) {
+function ModelInfos({ model, loadingPrompt }: { model: string; loadingPrompt: boolean }) {
   const [modelInfo, setModelInfo] = useState<LlamaCppInfo>(null);
   const [systemPrompt, setSystemPrompt] = useState<string>("");
   const [temperature, setTemperature] = useState<number>(0);
@@ -253,13 +253,13 @@ function ModelInfos({ model }: { model: string }) {
                         rows={2}
                         placeholder={`Start typing here, and press enter or click on the button`}
                         onChange={(e) => setSystemPrompt(e.target.value)}
+                        disabled={loadingPrompt}
                         onKeyDown={(e) => {
-                          {
-                            if (e.key == "Enter") {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              sendSystemPrompt();
-                            }
+                          if (loadingPrompt) return;
+                          if (e.key == "Enter") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            sendSystemPrompt();
                           }
                         }}
                         value={systemPrompt}
@@ -267,8 +267,12 @@ function ModelInfos({ model }: { model: string }) {
                       <div className="hidden justify-center sm:flex w-2/12">
                         <kbd
                           role="button"
-                          className="kbd kbd-sm hover:cursor-pointer focus:ring-primary/30"
+                          className={`kbd kbd-sm 
+                            hover:${loadingPrompt ? "cursor-not-allowed" : "cursor-pointer"} 
+                            focus:ring-primary/30
+                          `}
                           onClick={(e) => {
+                            if (loadingPrompt) return;
                             e.preventDefault();
                             e.stopPropagation();
                             sendSystemPrompt();
@@ -281,11 +285,12 @@ function ModelInfos({ model }: { model: string }) {
                         <button
                           type="button"
                           className={`
-                          focus:ring-primary/40
-                          focus:ring
-                          focus:outline-none
-                        `}
-                          aria-label="Start voice recording"
+                            focus:ring-primary/40
+                            focus:ring
+                            focus:outline-none
+                          `}
+                          aria-label="Send system prompt"
+                          disabled={loadingPrompt}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -304,8 +309,9 @@ function ModelInfos({ model }: { model: string }) {
                       <div className="w-full flex justify-end">
                         <button
                           type="button"
-                          className="btn btn-primary btn-sm shadow-xl"
+                          className="btn btn-primary btn-sm shadow-xl mt-2"
                           aria-label="Load another document"
+                          disabled={loadingPrompt}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();

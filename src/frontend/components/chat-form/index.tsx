@@ -200,12 +200,11 @@ const ChatForm = () => {
       id="chatLlama"
       className="w-full"
       onKeyDown={(e) => {
-        {
-          if (e.key == "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-            sendPrompt();
-          }
+        if (loadingModel || loadingPrompt) return;
+        if (e.key == "Enter") {
+          e.preventDefault();
+          e.stopPropagation();
+          sendPrompt();
         }
       }}
     >
@@ -220,8 +219,9 @@ const ChatForm = () => {
         <div className="flex gap-2 items-center">
           <button
             type="button"
-            className="btn btn-primary btn-sm shadow-xl"
+            className="btn btn-primary btn-sm shadow-xl w-24"
             aria-label="Load another model"
+            disabled={loadingModel || loadingPrompt}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -232,8 +232,9 @@ const ChatForm = () => {
           </button>
           <div className="flex gap-1 items-center rounded-md h-full">
             <select
-              className="select select-bordered select-sm ml-1 shadow-xl"
+              className="select select-bordered select-sm shadow-xl w-[8.5rem]"
               onChange={handleSelectGpuChange}
+              disabled={loadingModel || loadingPrompt}
               defaultValue="auto"
             >
               <option key="option-auto" value={"auto"}>
@@ -261,8 +262,9 @@ const ChatForm = () => {
         <div className="flex gap-2">
           <button
             type="button"
-            className="btn btn-primary btn-sm shadow-xl"
+            className="btn btn-primary btn-sm shadow-xl w-24"
             aria-label="Load old conversation from file"
+            disabled={loadingModel || loadingPrompt}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -273,8 +275,9 @@ const ChatForm = () => {
           </button>
           <button
             type="button"
-            className="btn btn-primary btn-sm shadow-xl"
+            className="btn btn-primary btn-sm shadow-xl w-16"
             aria-label="Change model"
+            disabled={loadingModel}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -289,8 +292,9 @@ const ChatForm = () => {
           </button>
           <button
             type="button"
-            className="btn btn-primary btn-sm shadow-xl"
+            className="btn btn-primary btn-sm shadow-xl w-16"
             aria-label="Save conversation"
+            disabled={loadingModel || loadingPrompt}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -305,7 +309,7 @@ const ChatForm = () => {
         {loadingModel ? (
           <div className="text-lg font-bold text-primary">Loading model, please wait...</div>
         ) : currentModel && currentModel !== "" ? (
-          <ModelInfos model={currentModel} />
+          <ModelInfos model={currentModel} loadingPrompt={loadingPrompt} />
         ) : (
           <div className="text-lg font-bold text-primary py-2">
             Missing model, read the instruction if needed
@@ -330,7 +334,7 @@ const ChatForm = () => {
             className={`
               w-full bg-transparent 
               textarea py-2 h-full textarea-ghost
-              focus:border-none focus:outline-none text-base leading-7
+              focus:border-none focus:outline-none text-base leading-6
               resize-none disabled:bg-transparent disabled:border-none
             `}
             rows={2}
@@ -343,7 +347,7 @@ const ChatForm = () => {
                 promptHistory &&
                 promptHistory.length > 0 &&
                 e.altKey &&
-                "|PageUp|PageDown|".includes("|" + e.key + "|")
+                "|PageUp|PageDown|Enter|".includes("|" + e.key + "|")
               ) {
                 const currentIndex = currentHistoryPromptIndex ?? 0;
 
@@ -358,6 +362,9 @@ const ChatForm = () => {
                       currentIndex + 1 > promptHistory.length - 1 ? 0 : currentIndex + 1,
                     );
                     break;
+                  case "Enter":
+                    setPrompt(prompt + "\n");
+                    break;
                 }
               }
             }}
@@ -367,8 +374,12 @@ const ChatForm = () => {
           <div className="hidden justify-center sm:flex w-2/12">
             <kbd
               role="button"
-              className="kbd kbd-sm hover:cursor-pointer focus:ring-primary/30"
+              className={`kbd kbd-sm 
+                hover:${loadingPrompt || loadingModel ? "cursor-not-allowed" : "cursor-pointer"} 
+                focus:ring-primary/30
+              `}
               onClick={(e) => {
+                if (loadingPrompt || loadingModel) return;
                 e.preventDefault();
                 e.stopPropagation();
                 sendPrompt();
@@ -385,7 +396,8 @@ const ChatForm = () => {
                 focus:ring
                 focus:outline-none
               `}
-              aria-label="Start voice recording"
+              aria-label="Send prompt"
+              disabled={loadingPrompt || loadingModel}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
