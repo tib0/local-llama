@@ -47,9 +47,7 @@ function About(): JSX.Element {
                   </li>
                   <li className="mt-1">
                     <span className="font-black text-primary text-xl mr-1">2</span>
-                    {
-                      " Adjust the GPU setting for optimal performance using Vulkan, CUDA, Metal,"
-                    }
+                    Adjust the GPU setting for optimal performance using Vulkan, CUDA, Metal,
                     or no GPU at all.
                   </li>
                   <li className="mt-1">
@@ -60,7 +58,7 @@ function About(): JSX.Element {
                   </li>
                   <li className="mt-1">
                     <span className="font-black text-primary text-xl mr-1">4</span>
-                    {" Begin conversing!"}
+                    {" Start chating!"}
                   </li>
                   <li className="mt-1">
                     <span className="font-black text-primary text-xl mr-1">5</span>
