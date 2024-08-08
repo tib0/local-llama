@@ -4,7 +4,7 @@
   <img src="./.github/logo_25.webp" />
 </p>
 <p align="center" style="font-size:18px; font-weight:800; margin: 5px;">
-  v0.0.8
+  v0.0.9
 </p>
 <p align="center" style="font-size:18px; font-weight:600; margin-bottom: 10px;">
   Local Llama also known as L³ is designed to be easy to use, with a user-friendly interface and advanced settings.
