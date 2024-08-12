@@ -21,6 +21,7 @@ export const mainWindowOptions = (dirname: string) =>
     show: false,
     width: 334,
     minWidth: 334,
+    icon: "./static/icon.png",
   }) as Electron.BrowserWindowConstructorOptions;
 
 export const splashWindowOptions: Electron.BrowserWindowConstructorOptions = {

@@ -2,6 +2,7 @@ export default {
   buildIdentifier: "esm",
   defaultResolved: true,
   packagerConfig: {
+    executableName: "Local-Llama",
     compression: "store",
     appCategoryType: "public.app-category.utilities",
     icon: "./static/icon",
@@ -43,9 +44,12 @@ export default {
     },
     {
       name: "@electron-forge/maker-deb",
+      executableName: "Local-Llama",
       config: {
         options: {
           icon: "./static/icon.png",
+          name: "Local-Llama",
+          productName: "Local-Llama",
         },
       },
     },
