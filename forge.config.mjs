@@ -2,7 +2,7 @@ export default {
   buildIdentifier: "esm",
   defaultResolved: true,
   packagerConfig: {
-    executableName: "Local-Llama",
+    executableName: "local-llama",
     compression: "store",
     appCategoryType: "public.app-category.utilities",
     icon: "./static/icon",
@@ -18,7 +18,7 @@ export default {
         iconUrl: "app://./static/icon.png",
         loadingGif: "static/waitin-lama.gif",
         setupIcon: "static/icon.ico",
-        name: "LocalLlamaChatApp",
+        name: "local-llama",
       },
     },
     {
@@ -29,7 +29,7 @@ export default {
         description: "Local Llama is an electron app that runs Llama 3 models locally",
         icon: "./static/icon.ico",
         name: "Local Llama",
-        shortcutFolderName: "Local-Llama",
+        shortcutFolderName: "local-llama",
         ui: {
           chooseDirectory: true,
         },
@@ -43,13 +43,30 @@ export default {
       },
     },
     {
+      name: "@electron-forge/maker-dmg",
+      config: {
+        background: "./static/icon.png",
+        format: "ULFO",
+        icon: "./static/icon.icns",
+        name: "Local Llama",
+        overwrite: true,
+      },
+    },
+    {
       name: "@electron-forge/maker-deb",
-      executableName: "Local-Llama",
+      executableName: "local-llama",
       config: {
         options: {
           icon: "./static/icon.png",
-          name: "Local-Llama",
-          productName: "Local-Llama",
+          name: "Local Llama",
+          productName: "Local Llama",
+          description: "Local Llama is an electron app that runs Llama 3 models locally",
+          productDescription:
+            "This recreational project aim to help you run LLM models locally 🚀. With local llama, you can safely use Llama 3 models without needing to register to any exernal services. You will be able to run gguf models.",
+          maintainer: "Tib0",
+          categories: ["Utility"],
+          genericName: "Local Llama AI Chat",
+          mimeType: ["lllh", "gguf"],
         },
       },
     },

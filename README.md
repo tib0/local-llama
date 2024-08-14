@@ -25,7 +25,7 @@
 
 <ul style="font-weight: 600;">
   <li>🔧 Customizable model settings</li>
-  <li>🖥️ Windows & Mac supported</li>
+  <li>🖥️ Windows, Linux & Mac supported</li>
   <li>📞 Save conversation history</li>
   <li>✈️ Offline</li>
   <li>💸 Free</li>
@@ -84,7 +84,7 @@ model will be compatible with Local Llama.
    [here](https://github.com/tib0/local-llama/releases/latest).
 2. Run the file `Local Llama.exe`. It will start an installer wich copy mandatory files to the
    right place (`%USERPROFILE%\appData\Roaming\"Local Llama"` and
-   `%USERPROFILE%\appData\Local\LocalLlamaChatApp`).
+   `%USERPROFILE%\appData\Local\local-llama`).
 3. Launch the app `Local Llama`.
 </details>
 
@@ -271,7 +271,7 @@ folder.
 
 1. Go to Settings > Applications > Uninstall, click on uninstall on "Local Llama".
 2. Remove the folder located here `%USERPROFILE%\appData\Roaming\"Local Llama"`
-3. Remove the folder located here `%USERPROFILE%\appData\Local\LocalLlamaChatApp`
+3. Remove the folder located here `%USERPROFILE%\appData\Local\local-llama`
 4. Remove the folder located here `%USERPROFILE%\.cache\local-llama`.
 </details>
 
