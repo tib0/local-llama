@@ -42,6 +42,7 @@ export default {
         icon: "./static/icon.icns",
       },
     },
+    /* Linux dmg: Uncomment to target dmg, need appdmg dep installed
     {
       name: "@electron-forge/maker-dmg",
       config: {
@@ -51,7 +52,7 @@ export default {
         name: "Local Llama",
         overwrite: true,
       },
-    },
+    }, */
     {
       name: "@electron-forge/maker-deb",
       executableName: "local-llama",
