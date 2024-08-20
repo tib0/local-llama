@@ -4,7 +4,7 @@
   <img src="./.github/logo_25.webp" />
 </p>
 <p align="center" style="font-size:18px; font-weight:800; margin: 5px;">
-  v0.0.9
+  v1.0.0
 </p>
 <p align="center" style="font-size:18px; font-weight:600; margin-bottom: 10px;">
   Local Llama also known as L³ is designed to be easy to use, with a user-friendly interface and advanced settings.
@@ -119,8 +119,8 @@ generated file.
     Dmg
   </summary>
 
-1. Install appdmg module ``npm i -D appdmg``
-2. Navigate to the file ``forge.config.mjs:45`` and uncomment the dmg maker.
+1. Install appdmg module `npm i -D appdmg`
+2. Navigate to the file `forge.config.mjs:45` and uncomment the dmg maker.
 3. Build and make the app from sources by looking at [Use from source](#use-from-source)
    section.
 4. Navigate to the `out` folder within your project's root directory, where you will find the
