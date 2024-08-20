@@ -104,12 +104,26 @@ generated file.
 
 <details>
   <summary>
-    All
+    Deb and rpm
   </summary>
 
 1. Build and make the app from sources by looking at [Use from source](#use-from-source)
    section.
 2. Navigate to the `out` folder within your project's root directory, where you will find the
+generated file.
+</details>
+
+</br>
+<details>
+  <summary>
+    Dmg
+  </summary>
+
+1. Install appdmg module ``npm i -D appdmg``
+2. Navigate to the file ``forge.config.mjs:45`` and uncomment the dmg maker.
+3. Build and make the app from sources by looking at [Use from source](#use-from-source)
+   section.
+4. Navigate to the `out` folder within your project's root directory, where you will find the
 generated file.
 </details>
 
