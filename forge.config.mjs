@@ -42,7 +42,7 @@ export default {
         icon: "./static/icon.icns",
       },
     },
-    /* Linux dmg: Uncomment to target dmg, need appdmg dep installed
+    /* DMG: Uncomment to target dmg, need appdmg dep installed
     {
       name: "@electron-forge/maker-dmg",
       config: {
