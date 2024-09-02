@@ -1,7 +1,7 @@
 {
   "name": "local-llama",
   "productName": "Local Llama",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "L³ or Local Llama is an electron app that runs Llama 3 models locally",
   "author": {
     "name": "Tib0",
