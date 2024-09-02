@@ -99,7 +99,6 @@
   },
   "overrides": {
     "axios": ">=1.7.4",
-    "rimraf": ">=4",
     "asar": {
       "@electron/asar": ">=3"
     },
