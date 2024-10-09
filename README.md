@@ -419,7 +419,7 @@ CC-BY-NC-ND :
 >
 > ##
 >
-> _Find out more [here](./LICENCE.md)_
+> _Find out more [here](./LICENSE.md)_
 
 # Have fun exploring Local Llama!
 
