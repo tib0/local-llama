@@ -412,7 +412,11 @@ export class LlamaWrapper {
       this.setStatus(loading, `Loading Llama lib`);
 
       this.llama = await this.module.getLlama({
-        build: "never",
+        cmakeOptions: {
+          GGML_NATIVE: "ON",
+        },
+        build: "try",
+        existingPrebuiltBinaryMustMatchBuildOptions: true,
         progressLogs: false,
         gpu: gpu ?? "auto",
         logLevel: LlamaLogLevel.debug,
