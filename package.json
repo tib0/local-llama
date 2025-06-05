@@ -1,7 +1,7 @@
 {
   "name": "local-llama",
   "productName": "Local Llama",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "L³ or Local Llama is an electron app that runs Llama 3 models locally",
   "author": {
     "name": "Tib0",
@@ -25,13 +25,13 @@
     "AI"
   ],
   "scripts": {
-    "build": "npm run format && npm run lint && npm run typecheck && electron-forge package",
     "foli": "npm run format && npm run lint && npm run typecheck",
+    "build": "npm run foli && electron-forge package",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.cts,.mts --fix",
     "make": "electron-forge make",
     "package": "electron-forge package",
-    "package:all": "npm run format && npm run lint && npm run typecheck && npm run package:mac-x64 && npm run package:mac-arm && npm run package:win-x64 && npm run package:linux-x64 && npm run package:linux-arm",
+    "package:all": "npm run foli && npm run package:mac-x64 && npm run package:mac-arm && npm run package:win-x64 && npm run package:linux-x64 && npm run package:linux-arm",
     "package:mac-x64": "cross-env NODE_ENV=production electron-forge package --platform=darwin --arch=x64",
     "package:mac-arm": "cross-env NODE_ENV=production electron-forge package --platform=darwin --arch=arm64",
     "package:win-x64": "cross-env NODE_ENV=production electron-forge package --platform=win32 --arch=x64",
@@ -94,24 +94,25 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "dependencies": {
-    "node-llama-cpp": "3.0.0-beta.44",
+    "node-llama-cpp": "3.9.0",
     "officeparser": "^4.1.1"
   },
   "overrides": {
-    "axios": ">=1.7.4",
+    "axios": ">=1.8.2",
     "asar": {
       "@electron/asar": ">=3"
     },
     "body-parser": ">=1.20.3",
     "cookie": ">=0.7.0",
     "express": ">=4.20.0",
-    "path-to-regexp": "0.1.10",
+    "path-to-regexp": ">=0.1.12",
     "send": ">=0.19.0",
     "vite": ">=4.5.4",
     "micromatch": ">=4.0.8",
     "xterm-addon-search": {
       "@xterm/addon-search": ">=0"
     },
+    "cross-spawn": ">=7.0.5",
     "xterm-addon-fit": {
       "@xterm/addon-fit": ">=0"
     },
