@@ -79,11 +79,11 @@ log.transports.file.resolvePathFn = () => {
 };
 
 if (app.isPackaged) {
-  log.transports.file.level = "info";
+  log.transports.file.level = "warn";
   log.transports.console.level = false;
 } else {
-  log.transports.file.level = "silly";
-  log.transports.console.level = "silly";
+  log.transports.file.level = "info";
+  log.transports.console.level = "debug";
 }
 
 log.eventLogger.startLogging();

@@ -214,7 +214,7 @@ export class LlamaWrapper {
           this.logger.silly(content);
           break;
         case warning:
-          this.logger.silly(content);
+          this.logger.warn(content);
           this.warning = payload;
           break;
         case error:
@@ -429,7 +429,7 @@ export class LlamaWrapper {
               this.setStatus(warning, "[LlamaEngine] " + message);
               break;
             case this.module.LlamaLogLevel.info:
-              this.logger.silly("[LlamaEngine]", message);
+              this.logger.info("[LlamaEngine]", message);
               break;
             case this.module.LlamaLogLevel.debug:
               this.logger.silly("[LlamaEngine]", message);
